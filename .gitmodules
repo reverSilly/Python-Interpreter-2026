@@ -1,0 +1,4 @@
+[submodule "resources/int2048"]
+	path = resources/int2048
+	url = https://github.com/reverSilly/int2048-2026.git
+	branch = main
