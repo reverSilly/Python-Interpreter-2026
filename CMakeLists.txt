@@ -13,9 +13,13 @@ include_directories(
 add_subdirectory(${PROJECT_SOURCE_DIR}/generated)
 ### YOU CAN'T MODIFY THE CODE ABOVE
 
+include_directories(resources/int2048/src/include)
+
 file(GLOB_RECURSE main_src src/*.cpp)
 
-add_executable(code ${main_src}) # Add all *.cpp file after src/main.cpp, like src/Evalvisitor.cpp did
+file(GLOB_RECURSE int_src resources/int2048/src/int2048.cpp)
+
+add_executable(code ${main_src} ${int_src}) # Add all *.cpp file after src/main.cpp, like src/Evalvisitor.cpp did
 
 ### YOU CAN'T MODIFY THE CODE BELOW
 target_link_libraries(code PyAntlr)
