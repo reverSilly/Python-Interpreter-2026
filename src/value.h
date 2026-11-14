@@ -44,15 +44,13 @@ namespace reverSilly
 			template<typename T>
 			T to()const
 			{
-				T res;
-				std::visit([&res](auto const &i)
+				return std::visit([](auto const &i)->T
 				{
 					if constexpr(std::is_convertible_v<decltype(i),T>)
-						res=static_cast<T>(i);
+						return static_cast<T>(i);
 					else
 					 	throw std::bad_cast{};
 				},data);
-				return res;
 			}
 			template<>
 			String to<String>()const
