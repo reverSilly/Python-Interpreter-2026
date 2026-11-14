@@ -4,7 +4,6 @@ project(python_interpreter)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Ofast")
 
-include_directories(${PROJECT_SOURCE_DIR}/resources/int2048/src/include)
 include_directories(/usr/include/antlr4-runtime/)
 include_directories(
 	${PROJECT_SOURCE_DIR}/generated/
@@ -14,10 +13,10 @@ include_directories(
 add_subdirectory(${PROJECT_SOURCE_DIR}/generated)
 ### YOU CAN'T MODIFY THE CODE ABOVE
 
+set(CMAKE_CXX_STANDARD 20)
 include_directories(resources/int2048/src/include)
 
 file(GLOB_RECURSE main_src src/*.cpp)
-
 file(GLOB_RECURSE int_src resources/int2048/src/int2048.cpp)
 
 add_executable(code ${main_src} ${int_src}) # Add all *.cpp file after src/main.cpp, like src/Evalvisitor.cpp did
