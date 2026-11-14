@@ -21,6 +21,7 @@ namespace reverSilly
 			using String=std::string;
 			using Tuple=std::vector<Value>;
 			std::variant<None,Boolean,Float,Integer,String,Tuple>data;
+			
 			template<typename T>
 			bool is()const
 			{
@@ -82,12 +83,30 @@ namespace reverSilly
 			template<typename R>
 			R visit(auto ...F)const
 			{
-				std::visit<R>(overloaded{F...},data);
+				return std::visit<R>(overloaded{F...},data);
 			}
 			template<typename R>
 			R visit(auto ...F)
 			{
-				std::visit<R>(overloaded{F...},data);
+				return std::visit<R>(overloaded{F...},data);
+			}
+			template<typename R>
+			R visit_with_default(auto ...F)const
+			{
+				return std::visit<R>(overloaded
+				{
+					F...,
+					[](auto &i){throw std::logic_error{"not implemented."};}
+				},data);
+			}
+			template<typename R>
+			R visit_with_default(auto ...F)
+			{
+				return std::visit<R>(overloaded
+				{
+					F...,
+					[](auto &i){throw std::logic_error{"not implemented."};}
+				},data);
 			}
 		};
 	}
