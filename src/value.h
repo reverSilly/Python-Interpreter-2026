@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <int2048.h>
+#include <utility.h>
 
 namespace reverSilly
 {
@@ -23,7 +24,11 @@ namespace reverSilly
 			template<typename T>
 			bool is()const
 			{
-				return (bool)std::get<T>(&data);
+				return (bool)std::get_if<T>(&data);
+			}
+			bool is_numeric()const
+			{
+				return is<Boolean>()||is<Float>()||is<Integer>();
 			}
 			template<typename T>
 			T &as()
@@ -51,25 +56,38 @@ namespace reverSilly
 			template<>
 			String to<String>()const
 			{
-				String res;
-				std::visit([&res](auto const &i)
-				{
-					using T=decltype(i);
-					if constexpr(std::is_same_v<T,None>)
-						return "None";
-					else if constexpr(std::is_same_v<T,Boolean>)
-						return i?"True":"False";
-					else if constexpr(std::is_same_v<T,Float>)
-						return std::to_string(i);
-					else if constexpr(std::is_same_v<T,Integer>)
-						return i.str();
-					else if constexpr(std::is_same_v<T,String>)
-						return i;
-					else if constexpr(std::is_same_v<T,Tuple>)
-						return "Tuple["+std::to_string(i.size())+"]";
-					else static_assert(false,"type not implemented");
-				},data);
-				return res;
+				return visit<String>
+				(
+					[](None){return "None";},
+					[](Boolean i){return i?"True":"False";},
+					[](Float i){return std::to_string(i);},
+					[](Integer const &i){return i.str();},
+					[](String const &i){return i;},
+					[](Tuple const &i){return "Tuple["+std::to_string(i.size())+"]";}
+				);
+			}
+			template<>
+			Boolean to<Boolean>()const
+			{
+				return visit<Boolean>
+				(
+					[](None){return false;},
+					[](Boolean i){return i;},
+					[](Float i){return i;},
+					[](Integer const &i){return i!=0;},
+					[](String const &i){return !i.empty();},
+					[](Tuple const &i){return !i.empty();}
+				);
+			}
+			template<typename R>
+			R visit(auto ...F)const
+			{
+				std::visit<R>(overloaded{F...},data);
+			}
+			template<typename R>
+			R visit(auto ...F)
+			{
+				std::visit<R>(overloaded{F...},data);
 			}
 		};
 	}
