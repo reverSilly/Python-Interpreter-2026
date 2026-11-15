@@ -1,5 +1,4 @@
 #include "escape.h"
-#include <cctype>
 #include <charconv>
 #include <string_view>
 #include <system_error>

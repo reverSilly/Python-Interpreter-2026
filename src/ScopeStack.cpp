@@ -11,7 +11,8 @@ namespace reverSilly::PythonInterpreter
 	{
 		if(auto p=try_find(name);p)
 			*p=std::move(v);
-		store(name,v);
+		else
+			store(name,v);
 	}
 	Value const &ScopeStack::find(std::string const &name)const
 	{
