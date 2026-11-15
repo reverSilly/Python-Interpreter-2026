@@ -1,9 +1,10 @@
-#include "Evalvisitor.h"
+#include "visitor.h"
 #include "Python3Lexer.h"
 #include "Python3Parser.h"
 #include "antlr4-runtime.h"
 #include <iostream>
 using namespace antlr4;
+using reverSilly::PythonInterpreter::Visitor;
 // TODO: regenerating files in directory named "generated" is dangerous.
 //       if you really need to regenerate,please ask TA for help.
 int main(int argc, const char *argv[]) {
@@ -14,7 +15,7 @@ int main(int argc, const char *argv[]) {
 	tokens.fill();
 	Python3Parser parser(&tokens);
 	tree::ParseTree *tree = parser.file_input();
-	EvalVisitor visitor;
+	Visitor visitor;
 	visitor.visit(tree);
 	return 0;
 }
