@@ -62,4 +62,23 @@ namespace reverSilly::PythonInterpreter
 			return std::floor(a/b);
 		}});
 	}
+	Value operator%(const Value &a, const Value &b)
+	{
+		using Integer=Value::Integer;
+		using Float=Value::Float;
+		auto fmod=[](Value::Float a,Value::Float b)
+		{
+			Float r=std::fmod(a, b);
+			if (r!=0&&((r<0)!=(b<0)))
+				r+=b;
+			return r;
+		};
+		return do_promoted<Value>(a,b,overloaded{[](Integer const &a,Integer const &b)
+		{
+			return a%b;
+		},[fmod](Float a,Float b)
+		{
+			return fmod(a,b);
+		}});
+	}
 }
