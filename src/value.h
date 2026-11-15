@@ -1,6 +1,5 @@
 #pragma once
 #include <compare>
-#include <stdexcept>
 #include <type_traits>
 #include <typeinfo>
 #include <variant>
@@ -80,7 +79,7 @@ namespace reverSilly
 				return visit<R>
 				(
 					F...,
-					[](auto &i)->R{throw std::logic_error{"not implemented."};}
+					[](auto &i)->R{throw_not_implemented();}
 				);
 			}
 			template<typename R>
@@ -89,7 +88,7 @@ namespace reverSilly
 				return visit<R>
 				(
 					F...,
-					[](auto &i)->R{throw std::logic_error{"not implemented."};}
+					[](auto &i)->R{throw_not_implemented();}
 				);
 			}
 			friend std::partial_ordering operator<=>(Value const&,Value const&);

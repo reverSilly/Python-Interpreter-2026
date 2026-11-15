@@ -1,7 +1,7 @@
 #include "value.h"
 #include "operators.h"
+#include "utility.h"
 #include <compare>
-#include <stdexcept>
 #include <typeinfo>
 
 namespace reverSilly::PythonInterpreter 
@@ -37,10 +37,10 @@ namespace reverSilly::PythonInterpreter
 		if(a.type()==b.type())
 		{
 			if(a.is<Value::None>())
-				throw std::logic_error{"Not defined."};
+				throw_not_defined();
 			return a<=>b;
 		}
-		throw std::logic_error{"Not implemented."};
+		throw_not_defined();
 	}
 	bool operator==(Value const &a,Value const &b)
 	{

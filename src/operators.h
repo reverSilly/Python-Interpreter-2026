@@ -1,5 +1,6 @@
 #pragma once
 #include "value.h"
+#include "utility.h"
 #include <stdexcept>
 
 namespace reverSilly::PythonInterpreter
@@ -15,7 +16,7 @@ namespace reverSilly::PythonInterpreter
 			return F(a.to<Value::Integer>(),b.to<Value::Integer>());
 		if(t==Type::Float)
 			return F(a.to<Value::Float>(),b.to<Value::Float>());
-		throw std::logic_error{"not implemented."};
+		throw_not_implemented();
 	}
 
 	Value operator+(Value const&,Value const&);
