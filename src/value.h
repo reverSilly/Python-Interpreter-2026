@@ -21,7 +21,15 @@ namespace reverSilly
 			using String=std::string;
 			using Tuple=std::vector<Value>;
 			std::variant<None,Boolean,Float,Integer,String,Tuple>data;
+			enum class Type
+			{
+				None=0,Boolean,Float,Integer,String,Tuple
+			};
 			
+			Type type()const
+			{
+				return static_cast<Type>(data.index());
+			}
 			template<typename T>
 			bool is()const
 			{
@@ -78,6 +86,25 @@ namespace reverSilly
 					[](Tuple const &i){return !i.empty();}
 				);
 			}
+			template<>
+			Float to<Float>()const
+			{
+				return visit_with_default<Float>
+				(
+					[](Boolean a){return a;},
+					[](Integer const &a){return a.to<Float>();}
+				);
+			}
+			template<>
+			Integer to<Integer>()const
+			{
+				return visit_with_default<Float>
+				(
+					[](Boolean a){return a;},
+					[](Float a){return a;},
+					[](Integer const &a){return a;}
+				);
+			}
 			template<typename R>
 			R visit(auto ...F)const
 			{
@@ -91,20 +118,20 @@ namespace reverSilly
 			template<typename R>
 			R visit_with_default(auto ...F)const
 			{
-				return std::visit<R>(overloaded
-				{
+				return visit<R>
+				(
 					F...,
-					[](auto &i){throw std::logic_error{"not implemented."};}
-				},data);
+					[](auto &i)->R{throw std::logic_error{"not implemented."};}
+				);
 			}
 			template<typename R>
 			R visit_with_default(auto ...F)
 			{
-				return std::visit<R>(overloaded
-				{
+				return visit<R>
+				(
 					F...,
-					[](auto &i){throw std::logic_error{"not implemented."};}
-				},data);
+					[](auto &i)->R{throw std::logic_error{"not implemented."};}
+				);
 			}
 		};
 	}
