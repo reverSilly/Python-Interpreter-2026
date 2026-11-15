@@ -92,16 +92,16 @@ namespace reverSilly
 				return visit_with_default<Float>
 				(
 					[](Boolean a){return a;},
-					[](Integer const &a){return a.to<Float>();}
+					[](Integer const &a){return a.to<Float>();},
+					[](Float a){return a;}
 				);
 			}
 			template<>
 			Integer to<Integer>()const
 			{
-				return visit_with_default<Float>
+				return visit_with_default<Integer>
 				(
 					[](Boolean a){return a;},
-					[](Float a){return a;},
 					[](Integer const &a){return a;}
 				);
 			}
