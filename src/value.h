@@ -1,4 +1,3 @@
-#include <cmath>
 #include <stdexcept>
 #include <type_traits>
 #include <typeinfo>
@@ -63,52 +62,6 @@ namespace reverSilly
 				},data);
 			}
 			Value to(Type)const;
-			template<>
-			String to<String>()const
-			{
-				return visit<String>
-				(
-					[](None){return "None";},
-					[](Boolean i){return i?"True":"False";},
-					[](Float i){return std::to_string(i);},
-					[](Integer const &i){return i.str();},
-					[](String const &i){return i;},
-					[](Tuple const &i){return "Tuple["+std::to_string(i.size())+"]";}
-				);
-			}
-			template<>
-			Boolean to<Boolean>()const
-			{
-				return visit<Boolean>
-				(
-					[](None){return false;},
-					[](Boolean i){return i;},
-					[](Float i){return i;},
-					[](Integer const &i){return i!=0;},
-					[](String const &i){return !i.empty();},
-					[](Tuple const &i){return !i.empty();}
-				);
-			}
-			template<>
-			Float to<Float>()const
-			{
-				return visit_with_default<Float>
-				(
-					[](Boolean a){return a;},
-					[](Integer const &a){return a.to<Float>();},
-					[](Float a){return a;}
-				);
-			}
-			template<>
-			Integer to<Integer>()const
-			{
-				return visit_with_default<Integer>
-				(
-					[](Boolean a){return a;},
-					[](Integer const &a){return a;},
-					[](Float a){return Integer(a);}
-				);
-			}
 			template<typename R>
 			R visit(auto ...F)const
 			{
@@ -140,5 +93,51 @@ namespace reverSilly
 			static Type common_type(Type,Type);
 			static bool is_numeric(Type);
 		};
+		template<>
+		inline Value::String Value::to<Value::String>()const
+		{
+			return visit<String>
+			(
+				[](None){return "None";},
+				[](Boolean i){return i?"True":"False";},
+				[](Float i){return std::to_string(i);},
+				[](Integer const &i){return i.str();},
+				[](String const &i){return i;},
+				[](Tuple const &i){return "Tuple["+std::to_string(i.size())+"]";}
+			);
+		}
+		template<>
+		inline Value::Boolean Value::to<Value::Boolean>()const
+		{
+			return visit<Boolean>
+			(
+				[](None){return false;},
+				[](Boolean i){return i;},
+				[](Float i){return i;},
+				[](Integer const &i){return i!=0;},
+				[](String const &i){return !i.empty();},
+				[](Tuple const &i){return !i.empty();}
+			);
+		}
+		template<>
+		inline Value::Float Value::to<Value::Float>()const
+		{
+			return visit_with_default<Float>
+			(
+				[](Boolean a){return a;},
+				[](Integer const &a){return a.to<Float>();},
+				[](Float a){return a;}
+			);
+		}
+		template<>
+		inline Value::Integer Value::to<Value::Integer>()const
+		{
+			return visit_with_default<Integer>
+			(
+				[](Boolean a){return a;},
+				[](Integer const &a){return a;},
+				[](Float a){return Integer(a);}//this is not so good. loss precision.
+			);
+		}
 	}
 }

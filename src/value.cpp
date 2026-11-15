@@ -1,4 +1,5 @@
-#include"value.h"
+#include "value.h"
+#include <typeinfo>
 
 namespace reverSilly::PythonInterpreter 
 {
@@ -23,5 +24,6 @@ namespace reverSilly::PythonInterpreter
 			case Type::String:return {to<String>()};
 			case Type::Tuple:return {to<Tuple>()};
 		}
+		throw std::bad_cast{};
 	}
 }
