@@ -20,11 +20,13 @@ namespace reverSilly
 			using Integer=sjtu::int2048;
 			using String=std::string;
 			using Tuple=std::vector<Value>;
-			std::variant<None,Boolean,Float,Integer,String,Tuple>data;
+#define TYPES None,Boolean,Float,Integer,String,Tuple
+			std::variant<TYPES>data;
 			enum class Type
 			{
-				None=0,Boolean,Float,Integer,String,Tuple
+				TYPES
 			};
+#undef TYPES
 			
 			Type type()const
 			{
@@ -37,7 +39,7 @@ namespace reverSilly
 			}
 			bool is_numeric()const
 			{
-				return is<Boolean>()||is<Float>()||is<Integer>();
+				return is_numeric(type());
 			}
 			template<typename T>
 			T &as()
@@ -60,6 +62,7 @@ namespace reverSilly
 					 	throw std::bad_cast{};
 				},data);
 			}
+			Value to(Type)const;
 			template<>
 			String to<String>()const
 			{
@@ -102,7 +105,8 @@ namespace reverSilly
 				return visit_with_default<Integer>
 				(
 					[](Boolean a){return a;},
-					[](Integer const &a){return a;}
+					[](Integer const &a){return a;},
+					[](Float a){return Integer(a);}
 				);
 			}
 			template<typename R>
@@ -133,6 +137,8 @@ namespace reverSilly
 					[](auto &i)->R{throw std::logic_error{"not implemented."};}
 				);
 			}
+			static Type common_type(Type,Type);
+			static bool is_numeric(Type);
 		};
 	}
 }
