@@ -13,6 +13,7 @@ include_directories(
 add_subdirectory(${PROJECT_SOURCE_DIR}/generated)
 ### YOU CAN'T MODIFY THE CODE ABOVE
 
+add_subdirectory(resources/int2048)
 set(CMAKE_CXX_STANDARD 20)
 include_directories(resources/int2048/src/include)
 
