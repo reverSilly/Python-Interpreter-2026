@@ -30,12 +30,22 @@ namespace reverSilly::PythonInterpreter
 		throw std::bad_cast{};
 	}
 
-	std::strong_ordering operator<=>(Value const &a,Value const &b)
+	std::partial_ordering operator<=>(Value const &a,Value const &b)
 	{
 		if(a.is_numeric()&&b.is_numeric())
-			return do_promoted(a,b,[](auto &a,auto &b){return a<=>b;});
+			return do_promoted<std::partial_ordering>(a,b,[](auto const &a,auto const &b){return a<=>b;});
 		if(a.type()==b.type())
+		{
+			if(a.is<Value::None>())
+				throw std::logic_error{"Not defined."};
 			return a<=>b;
+		}
 		throw std::logic_error{"Not implemented."};
+	}
+	bool operator==(Value const &a,Value const &b)
+	{
+		if(a.is_numeric()&&b.is_numeric())
+			return do_promoted<bool>(a,b,[](auto const &a,auto const &b){return a==b;});
+		return a==b;
 	}
 }

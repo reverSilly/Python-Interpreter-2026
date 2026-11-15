@@ -1,4 +1,5 @@
 #pragma once
+#include <compare>
 #include <stdexcept>
 #include <type_traits>
 #include <typeinfo>
@@ -91,7 +92,7 @@ namespace reverSilly
 					[](auto &i)->R{throw std::logic_error{"not implemented."};}
 				);
 			}
-			friend std::strong_ordering operator<=>(Value const&,Value const&);
+			friend std::partial_ordering operator<=>(Value const&,Value const&);
 			friend bool operator==(Value const&,Value const&);
 			friend bool operator!=(Value const&,Value const&)=default;
 			friend bool operator<(Value const&,Value const&)=default;

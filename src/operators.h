@@ -4,7 +4,8 @@
 
 namespace reverSilly::PythonInterpreter
 {
-	auto do_promoted(Value const &a,Value const &b,auto F)
+	template<typename R>
+	R do_promoted(Value const &a,Value const &b,auto F)
 	{
 		using Type=Value::Type;
 		if(!a.is_numeric()||!b.is_numeric())
