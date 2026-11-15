@@ -1,7 +1,6 @@
 #include "value.h"
-#include <compare>
 
-namespace reverSilly::Python3Interpreter
+namespace reverSilly::PythonInterpreter
 {
 	Value do_promoted(Value const&,Value const&,auto F);
 	Value operator+(Value const&,Value const&);
@@ -13,11 +12,4 @@ namespace reverSilly::Python3Interpreter
 	Value operator+(Value const&);
 	Value operator-(Value const&);
 
-	std::strong_ordering operator<=>(Value const&,Value const&);
-	bool operator==(Value const&,Value const&);
-	bool operator!=(Value const&,Value const&)=default;
-	bool operator<(Value const&,Value const&)=default;
-	bool operator<=(Value const&,Value const&)=default;
-	bool operator>(Value const&,Value const&)=default;
-	bool operator>=(Value const&,Value const&)=default;
 }

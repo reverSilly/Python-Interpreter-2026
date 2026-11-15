@@ -90,6 +90,14 @@ namespace reverSilly
 					[](auto &i)->R{throw std::logic_error{"not implemented."};}
 				);
 			}
+			friend std::strong_ordering operator<=>(Value const&,Value const&);
+			friend bool operator==(Value const&,Value const&);
+			friend bool operator!=(Value const&,Value const&)=default;
+			friend bool operator<(Value const&,Value const&)=default;
+			friend bool operator<=(Value const&,Value const&)=default;
+			friend bool operator>(Value const&,Value const&)=default;
+			friend bool operator>=(Value const&,Value const&)=default;
+
 			static Type common_type(Type,Type);
 			static bool is_numeric(Type);
 		};
