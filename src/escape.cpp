@@ -2,6 +2,7 @@
 #include <cctype>
 #include <charconv>
 #include <string_view>
+#include <system_error>
 
 namespace reverSilly::PythonInterpreter
 {
@@ -35,26 +36,31 @@ namespace reverSilly::PythonInterpreter
 		{
 			if(*it!='\\')
 				res+=*it;
-			else if(char app=0;++it!=str.end())
+			else if(unsigned int ch=0;++it!=str.end())
 			{
 				switch(*it)
 				{
-					case 'a':app='\a';break;
-					case 'b':app='\b';break;
-					case 'f':app='\f';break;
-					case 'n':app='\n';break;
-					case 'r':app='\r';break;
-					case 't':app='\t';break;
-					case 'v':app='\v';break;
+					case 'a':ch='\a';break;
+					case 'b':ch='\b';break;
+					case 'f':ch='\f';break;
+					case 'n':ch='\n';break;
+					case 'r':ch='\r';break;
+					case 't':ch='\t';break;
+					case 'v':ch='\v';break;
 					case 'x':
-						it=std::from_chars(it,str.end(),app,16).ptr;
+					{
+						auto[jt,ec]=std::from_chars(it+1,str.end(),ch,16);
+						if(ec!=std::errc{})
+							ch='x';
+						it=jt;
+					}
 					break;
 					default:
 					if('0'<=*it&&*it<'8')
-						it=std::from_chars(it,std::min(it+3,str.end()),app,8).ptr;
-					else app=*it;
+						it=std::from_chars(it,std::min(it+3,str.end()),ch,8).ptr;
+					else ch=*it;
 				}
-				res+=app;
+				res+=ch;
 				if(it==str.end())
 					break;
 			}
