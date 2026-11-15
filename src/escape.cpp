@@ -46,22 +46,21 @@ namespace reverSilly::PythonInterpreter
 					case 'r':ch='\r';break;
 					case 't':ch='\t';break;
 					case 'v':ch='\v';break;
+					case '\n':continue;
 					case 'x':
 					{
 						auto[jt,ec]=std::from_chars(it+1,str.end(),ch,16);
 						if(ec!=std::errc{})
 							ch='x';
-						it=jt;
+						it=jt-1;
 					}
 					break;
 					default:
 					if('0'<=*it&&*it<'8')
-						it=std::from_chars(it,std::min(it+3,str.end()),ch,8).ptr;
+						it=std::from_chars(it,std::min(it+3,str.end()),ch,8).ptr-1;
 					else ch=*it;
 				}
 				res+=ch;
-				if(it==str.end())
-					break;
 			}
 			else break;
 		}
