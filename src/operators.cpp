@@ -50,7 +50,7 @@ namespace reverSilly::PythonInterpreter
 	{
 		return {a.to<Value::Float>()/b.to<Value::Float>()};
 	}
-	Value floor_division(const Value &a, const Value &b)
+	Value floor_division(const Value &a,const Value &b)
 	{
 		using Integer=Value::Integer;
 		using Float=Value::Float;
@@ -62,7 +62,7 @@ namespace reverSilly::PythonInterpreter
 			return std::floor(a/b);
 		}});
 	}
-	Value operator%(const Value &a, const Value &b)
+	Value operator%(const Value &a,const Value &b)
 	{
 		using Integer=Value::Integer;
 		using Float=Value::Float;
@@ -80,5 +80,23 @@ namespace reverSilly::PythonInterpreter
 		{
 			return fmod(a,b);
 		}});
+	}
+	Value operator+(const Value &a)
+	{
+		if(a.type()==Value::Type::Boolean)
+			return {a.to<Value::Integer>()};
+		if(a.is_numeric())
+			return a;
+		throw_not_defined();
+	}
+	Value operator-(const Value &a)
+	{
+		if(a.type()==Value::Type::Boolean)
+			return {-a.to<Value::Integer>()};
+		return a.visit_with_default<Value>
+		(
+			[](Value::Integer const &a){return -a;},
+			[](Value::Float a){return -a;}
+		);
 	}
 }
