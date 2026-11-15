@@ -1,4 +1,7 @@
 #include "value.h"
+#include "operators.h"
+#include <compare>
+#include <stdexcept>
 #include <typeinfo>
 
 namespace reverSilly::PythonInterpreter 
@@ -25,5 +28,14 @@ namespace reverSilly::PythonInterpreter
 			case Type::Tuple:return {to<Tuple>()};
 		}
 		throw std::bad_cast{};
+	}
+
+	std::strong_ordering operator<=>(Value const &a,Value const &b)
+	{
+		if(a.is_numeric()&&b.is_numeric())
+			return do_promoted(a,b,[](auto &a,auto &b){return a<=>b;});
+		if(a.type()==b.type())
+			return a<=>b;
+		throw std::logic_error{"Not implemented."};
 	}
 }
