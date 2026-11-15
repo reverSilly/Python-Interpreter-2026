@@ -95,8 +95,8 @@ namespace reverSilly::PythonInterpreter
 			return {-a.to<Value::Integer>()};
 		return a.visit_with_default<Value>
 		(
-			[](Value::Integer const &a){return -a;},
-			[](Value::Float a){return -a;}
+			[](Value::Integer const &a)->Value{return {-a};},
+			[](Value::Float a)->Value{return {-a};}
 		);
 	}
 }

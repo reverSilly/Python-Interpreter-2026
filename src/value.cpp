@@ -38,7 +38,7 @@ namespace reverSilly::PythonInterpreter
 		{
 			if(a.is<Value::None>())
 				throw_not_defined();
-			return a<=>b;
+			return a.data<=>b.data;
 		}
 		throw_not_defined();
 	}
@@ -46,6 +46,6 @@ namespace reverSilly::PythonInterpreter
 	{
 		if(a.is_numeric()&&b.is_numeric())
 			return do_promoted<bool>(a,b,[](auto const &a,auto const &b){return a==b;});
-		return a==b;
+		return a.data==b.data;
 	}
 }

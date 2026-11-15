@@ -13,9 +13,9 @@ namespace reverSilly::PythonInterpreter
 			throw std::logic_error{"not compatible types for arithmetic operation."};
 		Type t=Value::common_type(a.type(),b.type());
 		if(t==Type::Integer)
-			return F(a.to<Value::Integer>(),b.to<Value::Integer>());
+			return R{F(a.to<Value::Integer>(),b.to<Value::Integer>())};
 		if(t==Type::Float)
-			return F(a.to<Value::Float>(),b.to<Value::Float>());
+			return R{F(a.to<Value::Float>(),b.to<Value::Float>())};
 		throw_not_implemented();
 	}
 
