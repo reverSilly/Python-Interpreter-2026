@@ -42,6 +42,10 @@ namespace reverSilly
 			{
 				return static_cast<Type>(data.index());
 			}
+			std::string_view type_name()const
+			{
+				return PythonInterpreter::type_name(type());
+			}
 			template<typename T>
 			bool is()const
 			{
