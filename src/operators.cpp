@@ -4,7 +4,6 @@
 #include "value.h"
 #include <cmath>
 #include <format>
-#include <stdexcept>
 #include <type_traits>
 
 namespace reverSilly::PythonInterpreter
@@ -55,12 +54,6 @@ namespace reverSilly::PythonInterpreter
 	Value operator/(Value const &a,Value const &b)
 	{
 		return {a.to<Float>()/check_fzero(b.to<Float>())};
-	}
-	auto rethrow(auto F)
-	{
-		try{ return F(); }
-		catch(std::invalid_argument &e)
-		{ throw ProgramError(e.what()); }
 	}
 	Value floor_division(const Value &a,const Value &b)
 	{

@@ -11,4 +11,11 @@ namespace reverSilly::PythonInterpreter
 	struct overloaded:T...{ using T::operator()...; };
 	[[noreturn]]void throw_not_implemented(std::string msg);
 	[[noreturn]]void throw_program_error(std::string msg);
+
+	auto rethrow(auto F)
+	{
+		try{ return F(); }
+		catch(std::exception &e)
+		{ throw ProgramError(e.what()); }
+	}
 }
