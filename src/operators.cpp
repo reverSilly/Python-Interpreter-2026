@@ -3,6 +3,7 @@
 #include "utility.h"
 #include "value.h"
 #include <cmath>
+#include <format>
 
 namespace reverSilly::PythonInterpreter
 {
@@ -10,11 +11,11 @@ namespace reverSilly::PythonInterpreter
 	{
 		if(a.is<String>()&&b.is<String>())
 			return {a.as<String>()+b.as<String>()};
-		return do_promoted<Value>(a,b,[](auto const &a,auto const &b){return a+b;});
+		return do_promoted<Value>(a,b,[](auto const &a,auto const &b){return a+b;},"+");
 	}
 	Value operator-(Value const &a,Value const &b)
 	{
-		return do_promoted<Value>(a,b,[](auto const &a,auto const &b){return a-b;});
+		return do_promoted<Value>(a,b,[](auto const &a,auto const &b){return a-b;},"-");
 	}
 	std::string repeat(std::string s,int2048::Integer const &n)
 	{
@@ -41,7 +42,7 @@ namespace reverSilly::PythonInterpreter
 			return str(a,b);
 		if(bool_or_int(a.type())&&b.type()==Type::String)
 			return str(b,a);
-		return do_promoted<Value>(a,b,[](auto const &a,auto const &b){return a*b;});
+		return do_promoted<Value>(a,b,[](auto const &a,auto const &b){return a*b;},"*");
 	}
 	Value operator/(Value const &a,Value const &b)
 	{
@@ -55,7 +56,7 @@ namespace reverSilly::PythonInterpreter
 		},[](Float a,Float b)
 		{
 			return std::floor(a/b);
-		}});
+		}},"//");
 	}
 	Value operator%(const Value &a,const Value &b)
 	{
@@ -72,7 +73,7 @@ namespace reverSilly::PythonInterpreter
 		},[fmod](Float a,Float b)
 		{
 			return fmod(a,b);
-		}});
+		}},"%");
 	}
 	Value operator+(const Value &a)
 	{
@@ -80,7 +81,7 @@ namespace reverSilly::PythonInterpreter
 			return {a.to<Integer>()};
 		if(a.is_numeric())
 			return a;
-		throw_not_defined();
+		throw_not_defined(std::format("unary operator+ not defined for type:{}",a.type_name()));
 	}
 	Value operator-(const Value &a)
 	{

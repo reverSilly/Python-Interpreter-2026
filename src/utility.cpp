@@ -3,12 +3,12 @@
 
 namespace reverSilly
 {
-	void throw_not_implemented()
+	void throw_not_implemented(std::string msg)
 	{
-		throw std::logic_error{"Not implemented."};
+		throw std::logic_error{std::move(msg)};
 	}
-	void throw_not_defined()
+	void throw_not_defined(std::string msg)
 	{
-		throw std::logic_error{"Not defined."};
+		throw ProgramError{std::move(msg)};
 	}
 }

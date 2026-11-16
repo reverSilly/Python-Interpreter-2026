@@ -1,8 +1,14 @@
 #pragma once
+#include <stdexcept>
+
 namespace reverSilly
 {
+	struct ProgramError:std::runtime_error
+	{
+		using std::runtime_error::runtime_error;
+	};
 	template<class...T>
 	struct overloaded:T...{ using T::operator()...; };
-	[[noreturn]]void throw_not_implemented();
-	[[noreturn]]void throw_not_defined();
+	[[noreturn]]void throw_not_implemented(std::string msg);
+	[[noreturn]]void throw_not_defined(std::string msg);
 }

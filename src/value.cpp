@@ -4,6 +4,7 @@
 #include <compare>
 #include <string_view>
 #include <typeinfo>
+#include <format>
 
 namespace reverSilly::PythonInterpreter 
 {
@@ -17,7 +18,7 @@ namespace reverSilly::PythonInterpreter
 			PY_TYPES(NOTHING)
 #undef NOTHING
 		}
-		throw_not_implemented();
+		throw_not_implemented(std::format("type_name not implemented for enum:{}",(int)t));
 	}
 #undef X
 
@@ -48,19 +49,19 @@ namespace reverSilly::PythonInterpreter
 	std::partial_ordering operator<=>(Value const &a,Value const &b)
 	{
 		if(a.is_numeric()&&b.is_numeric())
-			return do_promoted<std::partial_ordering>(a,b,[](auto const &a,auto const &b){return a<=>b;});
+			return do_promoted<std::partial_ordering>(a,b,[](auto const &a,auto const &b){return a<=>b;},"<=>");
 		if(a.type()==b.type())
 		{
 			if(a.is<None>())
-				throw_not_defined();
+				throw_not_defined("Compare is not defined for None");
 			return a.data<=>b.data;
 		}
-		throw_not_defined();
+		throw_not_defined(std::format("Compare is not defined for different types:{},{}",a.type_name(),b.type_name()));
 	}
 	bool operator==(Value const &a,Value const &b)
 	{
 		if(a.is_numeric()&&b.is_numeric())
-			return do_promoted<bool>(a,b,[](auto const &a,auto const &b){return a==b;});
+			return do_promoted<bool>(a,b,[](auto const &a,auto const &b){return a==b;},"==");
 		return a.data==b.data;
 	}
 }
