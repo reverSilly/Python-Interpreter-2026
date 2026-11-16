@@ -1,5 +1,6 @@
 #include "ScopeStack.h"
 #include <stdexcept>
+#include <utility>
 
 namespace reverSilly::PythonInterpreter
 {
@@ -35,6 +36,10 @@ namespace reverSilly::PythonInterpreter
 	Value *ScopeStack::try_find(std::string const &name)
 	{
 		return const_cast<Value*>(const_cast<ScopeStack const*>(this)->try_find(name));
+	}
+	void ScopeStack::push(Scope s)
+	{
+		scopes.push_back(std::move(s));
 	}
 	void ScopeStack::push()	
 	{

@@ -8,7 +8,8 @@ namespace reverSilly::PythonInterpreter
 {
 	struct ScopeStack
 	{
-		std::vector<std::unordered_map<std::string,Value>>scopes;
+		using Scope=std::unordered_map<std::string,Value>;
+		std::vector<Scope>scopes;
 		ScopeStack():scopes(1){}
 		void store(std::string const &name,Value v);//in current stack
 		void assign(std::string name,Value v);//search,else add in current stack
@@ -17,6 +18,7 @@ namespace reverSilly::PythonInterpreter
 		Value const *try_find(std::string const &name)const;
 		Value *try_find(std::string const &name);
 		void push();
+		void push(Scope);
 		void pop();
 	};
 
