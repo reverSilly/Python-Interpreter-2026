@@ -49,7 +49,7 @@ namespace reverSilly::PythonInterpreter
 	Float check_fzero(Float f)
 	{
 		if(f==0)
-			throw ProgramError{"divided by 0"};
+			throw ProgramError{"divided by zero"};
 		return f;
 	}
 	Value operator/(Value const &a,Value const &b)

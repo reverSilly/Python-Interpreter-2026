@@ -1,4 +1,6 @@
 #pragma once
+#include "utility.h"
+#include <format>
 #ifndef PYTHON_INTERPRETER_EVALVISITOR_H
 #define PYTHON_INTERPRETER_EVALVISITOR_H
 
@@ -15,6 +17,14 @@ namespace reverSilly::PythonInterpreter
 		using ParseTree=antlr4::tree::ParseTree;
 		Value evaluate(ParseTree*);
 		ControlFlow execute(ParseTree*);
+		std::any visitChildren(ParseTree *t)override
+		{
+			throw_not_implemented(std::format
+			(
+				"the visitor is not implemented on '{}'",
+				typeid(*t).name()
+			));
+		}
 	};
 }
 
