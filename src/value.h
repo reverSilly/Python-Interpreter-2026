@@ -12,21 +12,31 @@ namespace reverSilly
 {
 	namespace PythonInterpreter
 	{
+		struct Value;
+		using None=std::monostate;
+		using Boolean=bool;
+		using Float=double;
+		using Integer=sjtu::int2048;
+		using String=std::string;
+		using Tuple=std::vector<Value>;
+#define PY_TYPES(C) X(None) C X(Boolean) C X(Float) C X(Integer) C X(String) C X(Tuple)
+#define COMMA ,
+		enum class Type
+		{
+#define X(a) a
+			PY_TYPES(COMMA)
+#undef X
+		};
+		std::string_view type_name(Type t);
+		Type common_type(Type,Type);
+		bool is_numeric(Type);
+
 		struct Value
 		{
-			using None=std::monostate;
-			using Boolean=bool;
-			using Float=double;
-			using Integer=sjtu::int2048;
-			using String=std::string;
-			using Tuple=std::vector<Value>;
-#define TYPES None,Boolean,Float,Integer,String,Tuple
-			std::variant<TYPES>data;
-			enum class Type
-			{
-				TYPES
-			};
-#undef TYPES
+#define X(a) a
+			std::variant<PY_TYPES(COMMA)>data;
+#undef X
+#undef COMMA
 			
 			Type type()const
 			{
@@ -39,7 +49,7 @@ namespace reverSilly
 			}
 			bool is_numeric()const
 			{
-				return is_numeric(type());
+				return PythonInterpreter::is_numeric(type());
 			}
 			template<typename T>
 			T &as()
@@ -99,11 +109,9 @@ namespace reverSilly
 			friend bool operator>(Value const&,Value const&)=default;
 			friend bool operator>=(Value const&,Value const&)=default;
 
-			static Type common_type(Type,Type);
-			static bool is_numeric(Type);
 		};
 		template<>
-		inline Value::String Value::to<Value::String>()const
+		inline String Value::to<String>()const
 		{
 			return visit<String>
 			(
@@ -116,7 +124,7 @@ namespace reverSilly
 			);
 		}
 		template<>
-		inline Value::Boolean Value::to<Value::Boolean>()const
+		inline Boolean Value::to<Boolean>()const
 		{
 			return visit<Boolean>
 			(
@@ -129,7 +137,7 @@ namespace reverSilly
 			);
 		}
 		template<>
-		inline Value::Float Value::to<Value::Float>()const
+		inline Float Value::to<Float>()const
 		{
 			return visit_with_default<Float>
 			(
@@ -139,7 +147,7 @@ namespace reverSilly
 			);
 		}
 		template<>
-		inline Value::Integer Value::to<Value::Integer>()const
+		inline Integer Value::to<Integer>()const
 		{
 			return visit_with_default<Integer>
 			(

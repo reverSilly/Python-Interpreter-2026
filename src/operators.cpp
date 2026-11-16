@@ -8,8 +8,8 @@ namespace reverSilly::PythonInterpreter
 {
 	Value operator+(Value const &a,Value const &b)
 	{
-		if(a.is<Value::String>()&&b.is<Value::String>())
-			return {a.as<Value::String>()+b.as<Value::String>()};
+		if(a.is<String>()&&b.is<String>())
+			return {a.as<String>()+b.as<String>()};
 		return do_promoted<Value>(a,b,[](auto const &a,auto const &b){return a+b;});
 	}
 	Value operator-(Value const &a,Value const &b)
@@ -24,15 +24,12 @@ namespace reverSilly::PythonInterpreter
 				res+=s;
 		return res;
 	}
-	bool bool_or_int(Value::Type t)
+	bool bool_or_int(Type t)
 	{
-		return t==Value::Type::Boolean||t==Value::Type::Integer;
+		return t==Type::Boolean||t==Type::Integer;
 	};
 	Value operator*(Value const &a,Value const &b)
 	{
-		using String=Value::String;
-		using Integer=Value::Integer;
-		using Type=Value::Type;
 		auto str=[](Value const &a,Value const &b)->Value
 		{
 			Integer bb=b.to<Integer>();
@@ -48,12 +45,10 @@ namespace reverSilly::PythonInterpreter
 	}
 	Value operator/(Value const &a,Value const &b)
 	{
-		return {a.to<Value::Float>()/b.to<Value::Float>()};
+		return {a.to<Float>()/b.to<Float>()};
 	}
 	Value floor_division(const Value &a,const Value &b)
 	{
-		using Integer=Value::Integer;
-		using Float=Value::Float;
 		return do_promoted<Value>(a,b,overloaded{[](Integer const &a,Integer const &b)
 		{
 			return a/b;
@@ -64,9 +59,7 @@ namespace reverSilly::PythonInterpreter
 	}
 	Value operator%(const Value &a,const Value &b)
 	{
-		using Integer=Value::Integer;
-		using Float=Value::Float;
-		auto fmod=[](Value::Float a,Value::Float b)
+		auto fmod=[](Float a,Float b)
 		{
 			Float r=std::fmod(a, b);
 			if (r!=0&&((r<0)!=(b<0)))
@@ -83,20 +76,20 @@ namespace reverSilly::PythonInterpreter
 	}
 	Value operator+(const Value &a)
 	{
-		if(a.type()==Value::Type::Boolean)
-			return {a.to<Value::Integer>()};
+		if(a.type()==Type::Boolean)
+			return {a.to<Integer>()};
 		if(a.is_numeric())
 			return a;
 		throw_not_defined();
 	}
 	Value operator-(const Value &a)
 	{
-		if(a.type()==Value::Type::Boolean)
-			return {-a.to<Value::Integer>()};
+		if(a.type()==Type::Boolean)
+			return {-a.to<Integer>()};
 		return a.visit_with_default<Value>
 		(
-			[](Value::Integer const &a)->Value{return {-a};},
-			[](Value::Float a)->Value{return {-a};}
+			[](Integer const &a)->Value{return {-a};},
+			[](Float a)->Value{return {-a};}
 		);
 	}
 }

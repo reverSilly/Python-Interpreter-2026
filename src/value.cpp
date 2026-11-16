@@ -2,17 +2,32 @@
 #include "operators.h"
 #include "utility.h"
 #include <compare>
+#include <string_view>
 #include <typeinfo>
 
 namespace reverSilly::PythonInterpreter 
 {
-	Value::Type Value::common_type(Type a, Type b)
+
+#define X(a) case Type::a: return #a;
+	std::string_view type_name(Type t)
+	{
+		switch(t)
+		{
+#define NOTHING
+			PY_TYPES(NOTHING)
+#undef NOTHING
+		}
+		throw_not_implemented();
+	}
+#undef X
+
+	Type common_type(Type a, Type b)
 	{
 		if(a==Type::Float||b==Type::Float)
 			return Type::Float;
 		return Type::Integer;
 	}
-	bool Value::is_numeric(Type a)
+	bool is_numeric(Type a)
 	{
 		return a==Type::Boolean||a==Type::Float||a==Type::Integer;
 	}
@@ -36,7 +51,7 @@ namespace reverSilly::PythonInterpreter
 			return do_promoted<std::partial_ordering>(a,b,[](auto const &a,auto const &b){return a<=>b;});
 		if(a.type()==b.type())
 		{
-			if(a.is<Value::None>())
+			if(a.is<None>())
 				throw_not_defined();
 			return a.data<=>b.data;
 		}
