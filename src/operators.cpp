@@ -4,6 +4,8 @@
 #include "value.h"
 #include <cmath>
 #include <format>
+#include <stdexcept>
+#include <type_traits>
 
 namespace reverSilly::PythonInterpreter
 {
@@ -44,24 +46,40 @@ namespace reverSilly::PythonInterpreter
 			return str(b,a);
 		return do_promoted<Value>(a,b,[](auto const &a,auto const &b){return a*b;},"*");
 	}
+	Float check_fzero(Float f)
+	{
+		if(f==0)
+			throw ProgramError{"divided by 0"};
+		return f;
+	}
 	Value operator/(Value const &a,Value const &b)
 	{
-		return {a.to<Float>()/b.to<Float>()};
+		return {a.to<Float>()/check_fzero(b.to<Float>())};
+	}
+	auto rethrow(auto F)
+	{
+		try{ return F(); }
+		catch(std::invalid_argument &e)
+		{ throw ProgramError(e.what()); }
 	}
 	Value floor_division(const Value &a,const Value &b)
 	{
 		return do_promoted<Value>(a,b,overloaded{[](Integer const &a,Integer const &b)
 		{
-			return a/b;
+			return rethrow([&]()
+			{
+				return a/b;
+			});
 		},[](Float a,Float b)
 		{
-			return std::floor(a/b);
+			return std::floor(a/check_fzero(b));
 		}},"//");
 	}
 	Value operator%(const Value &a,const Value &b)
 	{
 		auto fmod=[](Float a,Float b)
 		{
+			check_fzero(b);
 			Float r=std::fmod(a, b);
 			if (r!=0&&((r<0)!=(b<0)))
 				r+=b;
@@ -69,7 +87,10 @@ namespace reverSilly::PythonInterpreter
 		};
 		return do_promoted<Value>(a,b,overloaded{[](Integer const &a,Integer const &b)
 		{
-			return a%b;
+			return rethrow([&]()
+			{
+				return a%b;
+			});
 		},[fmod](Float a,Float b)
 		{
 			return fmod(a,b);
@@ -81,16 +102,24 @@ namespace reverSilly::PythonInterpreter
 			return {a.to<Integer>()};
 		if(a.is_numeric())
 			return a;
-		throw_not_defined(std::format("unary operator+ not defined for type:{}",a.type_name()));
+		throw_not_defined(std::format("unary operator+ not defined for type: {}",a.type_name()));
 	}
 	Value operator-(const Value &a)
 	{
 		if(a.type()==Type::Boolean)
 			return {-a.to<Integer>()};
-		return a.visit_with_default<Value>
+		return a.visit<Value>
 		(
 			[](Integer const &a)->Value{return {-a};},
-			[](Float a)->Value{return {-a};}
+			[](Float a)->Value{return {-a};},
+			[](auto &&v)->Value
+			{
+				throw ProgramError{std::format
+				(
+					"unary operator- not defined for type: {}",
+					type_name<std::remove_cvref_t<decltype(v)>>()
+				)};
+			}
 		);
 	}
 }

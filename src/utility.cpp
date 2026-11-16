@@ -1,7 +1,7 @@
 #include "utility.h"
 #include <stdexcept>
 
-namespace reverSilly
+namespace reverSilly::PythonInterpreter
 {
 	void throw_not_implemented(std::string msg)
 	{

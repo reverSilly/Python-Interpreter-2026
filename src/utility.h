@@ -1,7 +1,7 @@
 #pragma once
 #include <stdexcept>
 
-namespace reverSilly
+namespace reverSilly::PythonInterpreter
 {
 	struct ProgramError:std::runtime_error
 	{

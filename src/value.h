@@ -1,6 +1,7 @@
 #pragma once
 #include <compare>
 #include <format>
+#include <string_view>
 #include <type_traits>
 #include <typeinfo>
 #include <variant>
@@ -29,6 +30,16 @@ namespace reverSilly
 #undef X
 		};
 		std::string_view type_name(Type t);
+		template<typename T>
+		constexpr std::string_view type_name()
+		{
+#define X(a) \
+			if constexpr(std::is_same_v<T,a>)\
+				return #a;
+			PY_TYPES(else)
+			else static_assert(false,"type not available");
+#undef X
+		}
 		Type common_type(Type,Type);
 		bool is_numeric(Type);
 
@@ -74,7 +85,7 @@ namespace reverSilly
 					if constexpr(std::is_convertible_v<decltype(i),T>)
 						return static_cast<T>(i);
 					else
-					 	throw std::bad_cast{};
+					 	return conversion_not_defined<T>()(i);
 				},data);
 			}
 			Value to(Type)const;
@@ -88,24 +99,6 @@ namespace reverSilly
 			{
 				return std::visit<R>(overloaded{F...},data);
 			}
-			template<typename R>
-			R visit_with_default(auto ...F)const
-			{
-				return visit<R>
-				(
-					F...,
-					[this](auto &i)->R{throw_not_implemented(std::format("visit not implemented on type:{}",type_name()));}
-				);
-			}
-			template<typename R>
-			R visit_with_default(auto ...F)
-			{
-				return visit<R>
-				(
-					F...,
-					[this](auto &i)->R{throw_not_implemented(std::format("visit not implemented on type:{}",type_name()));}
-				);
-			}
 			friend std::partial_ordering operator<=>(Value const&,Value const&);
 			friend bool operator==(Value const&,Value const&);
 			friend bool operator!=(Value const&,Value const&)=default;
@@ -114,6 +107,20 @@ namespace reverSilly
 			friend bool operator>(Value const&,Value const&)=default;
 			friend bool operator>=(Value const&,Value const&)=default;
 
+		private:
+			template<typename R>
+			static auto conversion_not_defined()
+			{
+				return [](auto &&v)->R
+				{
+					throw ProgramError{std::format
+					(
+						"cannot convert types: {}->{}",
+						PythonInterpreter::type_name<std::remove_cvref_t<decltype(v)>>(),
+						PythonInterpreter::type_name<std::remove_cvref_t<R>>()
+					)};
+				};
+			}
 		};
 		template<>
 		inline String Value::to<String>()const
@@ -144,21 +151,23 @@ namespace reverSilly
 		template<>
 		inline Float Value::to<Float>()const
 		{
-			return visit_with_default<Float>
+			return visit<Float>
 			(
 				[](Boolean a){return a;},
 				[](Integer const &a){return a.to<Float>();},
-				[](Float a){return a;}
+				[](Float a){return a;},
+				conversion_not_defined<Float>()
 			);
 		}
 		template<>
 		inline Integer Value::to<Integer>()const
 		{
-			return visit_with_default<Integer>
+			return visit<Integer>
 			(
 				[](Boolean a){return a;},
 				[](Integer const &a){return a;},
-				[](Float a){return Integer(a);}//this is not so good. loss precision.
+				[](Float a){return Integer(a);},//this is not so good. loss precision.
+				conversion_not_defined<Integer>()
 			);
 		}
 	}
