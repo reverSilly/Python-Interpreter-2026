@@ -132,7 +132,7 @@ namespace reverSilly
 				[](Float i){return std::to_string(i);},
 				[](Integer const &i){return i.str();},
 				[](String const &i){return i;},
-				[](Tuple const &i){return "Tuple["+std::to_string(i.size())+"]";}
+				[](Tuple const &i){return std::format("Tuple[{}]",i.size());}
 			);
 		}
 		template<>
@@ -156,6 +156,7 @@ namespace reverSilly
 				[](Boolean a){return a;},
 				[](Integer const &a){return a.to<Float>();},
 				[](Float a){return a;},
+				[](String const &a){return std::stod(a);},
 				conversion_not_defined<Float>()
 			);
 		}
@@ -167,6 +168,7 @@ namespace reverSilly
 				[](Boolean a){return a;},
 				[](Integer const &a){return a;},
 				[](Float a){return Integer(a);},//this is not so good. loss precision.
+				[](String const&a){return Integer(a);},
 				conversion_not_defined<Integer>()
 			);
 		}
