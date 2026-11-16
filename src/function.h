@@ -15,6 +15,7 @@ namespace reverSilly::PythonInterpreter
 		std::unordered_map<std::string,Value> named;
 	};
 	using Function=std::function<Value(Arguments)>;
+	using FunctionTable=std::unordered_map<std::string,Function>;
 
 	struct FunctionDefinition
 	{
