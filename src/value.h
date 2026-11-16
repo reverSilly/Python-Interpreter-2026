@@ -131,7 +131,20 @@ namespace reverSilly
 				[](Float i){return std::to_string(i);},
 				[](Integer const &i){return i.str();},
 				[](String const &i){return i;},
-				[](Tuple const &i){return std::format("Tuple[{}]",i.size());}
+				[](Tuple const &i)
+				{
+					String res("(");
+					bool first=true;
+					for(auto &j:i)
+					{
+						if(!first)
+							res+=',';
+						res+=j.to<String>();
+						first=false;
+					}
+					res+=')';
+					return res;
+				}
 			);
 		}
 		template<>
