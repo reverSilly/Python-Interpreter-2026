@@ -1,3 +1,4 @@
+#pragma once
 #include "Python3Parser.h"
 #include "ScopeStack.h"
 #include "value.h"
@@ -5,7 +6,6 @@
 #include <unordered_map>
 #include <vector>
 #include <functional>
-
 
 namespace reverSilly::PythonInterpreter
 {

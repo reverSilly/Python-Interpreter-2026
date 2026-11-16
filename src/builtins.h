@@ -1,3 +1,4 @@
+#pragma once
 #include "function.h"
 #include "value.h"
 

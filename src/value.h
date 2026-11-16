@@ -3,7 +3,6 @@
 #include <format>
 #include <string_view>
 #include <type_traits>
-#include <typeinfo>
 #include <variant>
 #include <string>
 #include <vector>

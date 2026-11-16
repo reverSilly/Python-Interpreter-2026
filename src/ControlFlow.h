@@ -1,6 +1,6 @@
+#pragma once
 #include "value.h"
 #include <variant>
-
 
 namespace reverSilly::PythonInterpreter
 {
