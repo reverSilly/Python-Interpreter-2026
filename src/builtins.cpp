@@ -42,12 +42,12 @@ namespace reverSilly::PythonInterpreter
 		}
 		Value print_(Arguments arg)
 		{
-			bool first=false;
 			String sep(" "),end("\n");
 			if(auto it=arg.named.find("sep");it!=arg.named.end())
 				sep=it->second.to<String>();
 			if(auto it=arg.named.find("end");it!=arg.named.end())
 				end=it->second.to<String>();
+			bool first=true;
 			for(auto &i:arg.positional)
 			{
 				if(!first)
