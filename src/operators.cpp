@@ -54,7 +54,7 @@ namespace reverSilly::PythonInterpreter
 	Value operator/(Value const &a,Value const &b)
 	{
 		if(!a.is_numeric()||!b.is_numeric())
-			throw_program_error(std::format("not implemented: {}/{}",a.type_name(),b.type_name()));
+			throw_program_error(std::format("not defined: {}/{}",a.type_name(),b.type_name()));
 		return rethrow([&]{return Value{a.to<Float>()/check_fzero(b.to<Float>())};});
 	}
 	Value floor_division(const Value &a,const Value &b)
