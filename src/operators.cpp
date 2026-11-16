@@ -53,13 +53,15 @@ namespace reverSilly::PythonInterpreter
 	}
 	Value operator/(Value const &a,Value const &b)
 	{
-		return {a.to<Float>()/check_fzero(b.to<Float>())};
+		if(!a.is_numeric()||!b.is_numeric())
+			throw_program_error(std::format("not implemented: {}/{}",a.type_name(),b.type_name()));
+		return rethrow([&]{return Value{a.to<Float>()/check_fzero(b.to<Float>())};});
 	}
 	Value floor_division(const Value &a,const Value &b)
 	{
 		return do_promoted<Value>(a,b,overloaded{[](Integer const &a,Integer const &b)
 		{
-			return rethrow([&]()
+			return rethrow([&]
 			{
 				return a/b;
 			});
@@ -80,7 +82,7 @@ namespace reverSilly::PythonInterpreter
 		};
 		return do_promoted<Value>(a,b,overloaded{[](Integer const &a,Integer const &b)
 		{
-			return rethrow([&]()
+			return rethrow([&]
 			{
 				return a%b;
 			});
