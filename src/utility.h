@@ -10,5 +10,5 @@ namespace reverSilly::PythonInterpreter
 	template<class...T>
 	struct overloaded:T...{ using T::operator()...; };
 	[[noreturn]]void throw_not_implemented(std::string msg);
-	[[noreturn]]void throw_not_defined(std::string msg);
+	[[noreturn]]void throw_program_error(std::string msg);
 }

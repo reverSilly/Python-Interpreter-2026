@@ -102,7 +102,7 @@ namespace reverSilly::PythonInterpreter
 			return {a.to<Integer>()};
 		if(a.is_numeric())
 			return a;
-		throw_not_defined(std::format("unary operator+ not defined for type: {}",a.type_name()));
+		throw_program_error(std::format("unary operator+ not defined for type: {}",a.type_name()));
 	}
 	Value operator-(const Value &a)
 	{

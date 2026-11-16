@@ -53,10 +53,10 @@ namespace reverSilly::PythonInterpreter
 		if(a.type()==b.type())
 		{
 			if(a.is<None>())
-				throw_not_defined("Compare is not defined for None");
+				throw_program_error("Compare is not defined for None");
 			return a.data<=>b.data;
 		}
-		throw_not_defined(std::format("Compare is not defined for different types:{},{}",a.type_name(),b.type_name()));
+		throw_program_error(std::format("Compare is not defined for different types:{},{}",a.type_name(),b.type_name()));
 	}
 	bool operator==(Value const &a,Value const &b)
 	{
