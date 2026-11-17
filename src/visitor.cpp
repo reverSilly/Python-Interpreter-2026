@@ -5,6 +5,7 @@
 #include "utility.h"
 #include "value.h"
 #include "escape.h"
+#include "operators.h"
 #include <any>
 #include <format>
 #include <utility>
@@ -120,7 +121,7 @@ namespace reverSilly::PythonInterpreter
 	{
 		if(!ctx->not_test())
 			return visit(ctx->comparison());
-		return Value{!evaluate(ctx->comparison()).to<Boolean>()};
+		return Value{!evaluate(ctx->not_test()).to<Boolean>()};
 	}
 	std::any Visitor::visitComparison(Python3Parser::ComparisonContext *ctx)
 	{
@@ -151,4 +152,21 @@ namespace reverSilly::PythonInterpreter
 		return Value{true};
 	}
 
+	std::any Visitor::visitArith_expr(Python3Parser::Arith_exprContext *ctx)
+	{
+		auto terms=ctx->term();
+		auto ops=ctx->addorsub_op();
+		auto it=terms.begin();
+		auto jt=ops.begin();
+		Value acc{evaluate(*(it++))};
+		for(;it!=terms.end()&&jt!=ops.end();++it,++jt)
+		{
+			auto op=*jt;
+			if(op->ADD())
+				acc=acc+evaluate(*it);
+			if(op->MINUS())
+				acc=acc-evaluate(*it);
+		}
+		return acc;
+	}
 }
