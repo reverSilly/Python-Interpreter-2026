@@ -221,16 +221,18 @@ namespace reverSilly::PythonInterpreter
 	{
 		if(!ctx->trailer())
 			return visit(ctx->atom());
-		return rethrow([this,ctx]->Value
+		if(!ctx->atom()->NAME())
+			throw ProgramError{std::format("function call not by name: {}",ctx->atom()->getText())};
+		auto const&fun=rethrow([this,ctx]()->auto&
 		{
-			auto const &fun=table.at(ctx->atom()->NAME()->getText());
-			return fun(parse_arguments(ctx->trailer()->arglist()));
+			return table.at(ctx->atom()->NAME()->getText());
 		});
+		return fun(parse_arguments(ctx->trailer()->arglist()));
 	}
 	Arguments Visitor::parse_arguments(Python3Parser::ArglistContext *ctx)
 	{
 		Arguments args;
-		for(auto i:ctx->argument())
+		if(ctx) for(auto i:ctx->argument())
 		{
 			if(i->ASSIGN())
 			{

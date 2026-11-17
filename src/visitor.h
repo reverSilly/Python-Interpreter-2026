@@ -19,8 +19,6 @@ namespace reverSilly::PythonInterpreter
 		using Value=reverSilly::PythonInterpreter::Value;
 		using ParseTree=antlr4::tree::ParseTree;
 
-		Visitor();
-
 		Value evaluate(ParseTree*);
 		ControlFlow execute(ParseTree*);
 		std::any visitChildren(ParseTree *t)override;
@@ -38,6 +36,8 @@ namespace reverSilly::PythonInterpreter
 
 		Value format(Python3Parser::Format_stringContext*);
 		Arguments parse_arguments(Python3Parser::ArglistContext*);
+	public:
+		Visitor();
 	};
 }
 
