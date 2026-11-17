@@ -9,6 +9,7 @@
 #include "escape.h"
 #include <any>
 #include <format>
+#include <utility>
 
 namespace reverSilly::PythonInterpreter
 {
@@ -80,7 +81,7 @@ namespace reverSilly::PythonInterpreter
 					res+=escape(term->getText(),f_escape);
 			}
 		}
-		return {res};
+		return {std::move(res)};
 	}
 	std::any Visitor::visitTestlist(Python3Parser::TestlistContext *ctx)
 	{
@@ -88,7 +89,11 @@ namespace reverSilly::PythonInterpreter
 		for(auto i:ctx->test())
 			res.emplace_back(evaluate(i));
 		if(res.size()==1)
-			return res.front();
-		return Value{res};
+		{
+			if(!ctx->COMMA().empty())
+				return Value{std::move(res)};
+			return std::move(res.front());
+		}
+		return Value{std::move(res)};
 	}
 }
