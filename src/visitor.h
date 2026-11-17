@@ -31,6 +31,7 @@ namespace reverSilly::PythonInterpreter
 		std::any visitComparison(Python3Parser::ComparisonContext*)override;
 		std::any visitArith_expr(Python3Parser::Arith_exprContext*)override;
 		std::any visitTerm(Python3Parser::TermContext*)override;
+		std::any visitFactor(Python3Parser::FactorContext*)override;
 
 		Value format(Python3Parser::Format_stringContext*);
 	};

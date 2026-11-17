@@ -197,5 +197,16 @@ namespace reverSilly::PythonInterpreter
 		return product;
 	}
 
+	std::any Visitor::visitFactor(Python3Parser::FactorContext *ctx)
+	{
+		if(ctx->atom_expr())
+			return visit(ctx->atom_expr());
+		if(auto fac=ctx->factor();ctx->ADD())
+			return +evaluate(fac);
+		else if(ctx->MINUS())
+			return -evaluate(fac);
+		throw_not_implemented("neither +/- ");
+	}
+
 	
 }
