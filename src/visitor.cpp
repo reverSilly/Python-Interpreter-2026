@@ -1,5 +1,8 @@
 #include "visitor.h"
 #include "Python3Parser.h"
+#include "Python3ParserBaseVisitor.h"
+#include "builtins.h"
+#include "function.h"
 #include "parse_number.h"
 #include "tree/TerminalNode.h"
 #include "utility.h"
@@ -12,6 +15,11 @@
 
 namespace reverSilly::PythonInterpreter
 {
+	Visitor::Visitor(): ::Python3ParserBaseVisitor()
+	{
+		inject_builtins(table);
+	}
+
 	Value Visitor::evaluate(ParseTree *p)
 	{
 		return std::any_cast<Value>(visit(p));
@@ -28,6 +36,7 @@ namespace reverSilly::PythonInterpreter
 			typeid(*t).name()
 		));
 	}
+
 	std::any Visitor::visitAtom(Python3Parser::AtomContext *ctx)
 	{
 		if(ctx->NUMBER())
@@ -208,5 +217,30 @@ namespace reverSilly::PythonInterpreter
 		throw_not_implemented("neither +/- ");
 	}
 
-	
+	std::any Visitor::visitAtom_expr(Python3Parser::Atom_exprContext *ctx)
+	{
+		if(!ctx->trailer())
+			return visit(ctx->atom());
+		return rethrow([this,ctx]->Value
+		{
+			auto const &fun=table.at(ctx->atom()->NAME()->getText());
+			return fun(parse_arguments(ctx->trailer()->arglist()));
+		});
+	}
+	Arguments Visitor::parse_arguments(Python3Parser::ArglistContext *ctx)
+	{
+		Arguments args;
+		for(auto i:ctx->argument())
+		{
+			if(i->ASSIGN())
+			{
+				std::string name=i->test(0)->getText();
+				if(auto[_,b]=args.named.insert({name,evaluate(i->test(1))});!b)
+					throw ProgramError{std::format("duplicated named arguments: {}",name)};
+			}
+			else
+				args.positional.push_back(evaluate(i->test().front()));
+		}
+		return args;
+	}
 }
