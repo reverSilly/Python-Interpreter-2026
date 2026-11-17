@@ -1,4 +1,7 @@
 #pragma once
+#include "Python3Parser.h"
+#include "ScopeStack.h"
+#include "function.h"
 #include "utility.h"
 #include <format>
 #ifndef PYTHON_INTERPRETER_EVALVISITOR_H
@@ -12,19 +15,18 @@ namespace reverSilly::PythonInterpreter
 {
 	class Visitor:public ::Python3ParserBaseVisitor 
 	{
+		FunctionTable table;
+		ScopeStack stk;
 		// TODO: override all methods of Python3ParserBaseVisitor
 		using Value=reverSilly::PythonInterpreter::Value;
 		using ParseTree=antlr4::tree::ParseTree;
+
 		Value evaluate(ParseTree*);
 		ControlFlow execute(ParseTree*);
-		std::any visitChildren(ParseTree *t)override
-		{
-			throw_not_implemented(std::format
-			(
-				"the visitor is not implemented on '{}'",
-				typeid(*t).name()
-			));
-		}
+		std::any visitChildren(ParseTree *t)override;
+		std::any visitAtom(Python3Parser::AtomContext*)override;
+
+		Value format(Python3Parser::Format_stringContext*);
 	};
 }
 

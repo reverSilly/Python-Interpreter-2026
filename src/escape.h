@@ -6,6 +6,15 @@
 namespace reverSilly::PythonInterpreter
 {
 	std::string default_escape(std::string_view& str);
+	std::string escape(std::string_view str,auto F)//not quoted
+	requires std::is_invocable_r_v<std::string,decltype(F),std::string_view&>
+	{
+		std::string res;
+		while(!str.empty())
+			res+=F(str);
+		return res;
+	}
+	
 
 	std::string parse_string(std::string_view str,auto F)//quoted string literal
 	requires std::is_invocable_r_v<std::string,decltype(F),std::string_view&>
@@ -33,9 +42,6 @@ namespace reverSilly::PythonInterpreter
 			str.remove_suffix(1);
 		if(raw)
 			return std::string(str);
-		std::string res;
-		while(!str.empty())
-			res+=F(str);
-		return res;
+		return escape(str,F);
 	}
 }
