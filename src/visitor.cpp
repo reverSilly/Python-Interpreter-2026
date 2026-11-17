@@ -64,7 +64,7 @@ namespace reverSilly::PythonInterpreter
 			if(char ch=str.front();str.starts_with("{{")||str.starts_with("}}"))
 			{
 				str.remove_prefix(2);
-				return {1,ch};
+				return {ch};
 			}
 			return default_escape(str);
 		};

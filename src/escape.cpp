@@ -10,7 +10,7 @@ namespace reverSilly::PythonInterpreter
 		if(unsigned ch=str.front();ch!='\\')
 		{
 			str.remove_prefix(1);
-			return {1,static_cast<char>(ch)};
+			return {static_cast<char>(ch)};
 		}
 		else
 		{
@@ -34,7 +34,7 @@ namespace reverSilly::PythonInterpreter
 						str.remove_prefix(1);
 						auto[jt,ec]=std::from_chars(str.begin(),str.end(),ch,16);
 						if(ec!=std::errc{})
-							return {1,'x'};
+							return {'x'};
 						str={jt-1,str.end()};
 					}
 					break;
@@ -53,7 +53,7 @@ namespace reverSilly::PythonInterpreter
 				}
 				str.remove_prefix(1);
 			}
-			return {1,static_cast<char>(ch)};
+			return {static_cast<char>(ch)};
 		} 
 	}
 	
