@@ -5,39 +5,19 @@
 
 namespace reverSilly::PythonInterpreter
 {
-	std::string escape(std::string_view str)//quoted string literal
+	std::string default_escape(std::string_view& str)
 	{
-		bool raw=false;
-		auto front_is=[](std::string_view str,std::string_view sv)
+		if(char ch=str.front();ch!='\\')
 		{
-			if(str.empty())
-				return false;
-			return sv.find(str.front())!=std::string_view::npos;
-		};
-		if(front_is(str,"rRuU"))
-		{
-			if(front_is(str,"rR"))
-				raw=true;
 			str.remove_prefix(1);
+			return {1,str.front()};
 		}
-		if(str.starts_with("'''")||str.starts_with("\"\"\""))
-			str.remove_prefix(3);
-		else if(front_is(str,"\'\""))
-			str.remove_prefix(1);
-		if(str.ends_with("'''")||str.ends_with("\"\"\""))
-			str.remove_suffix(3);
-		else if(!str.empty()&&(str.back()=='\''||str.back()=='"'))
-			str.remove_suffix(1);
-		if(raw)
-			return std::string(str);
-		std::string res;
-		for(auto it=str.begin();it!=str.end();++it)
+		else
 		{
-			if(*it!='\\')
-				res+=*it;
-			else if(unsigned int ch=0;++it!=str.end())
+			str.remove_prefix(1);
+			if(!str.empty())
 			{
-				switch(*it)
+				switch(str.front())
 				{
 					case 'a':ch='\a';break;
 					case 'b':ch='\b';break;
@@ -46,24 +26,33 @@ namespace reverSilly::PythonInterpreter
 					case 'r':ch='\r';break;
 					case 't':ch='\t';break;
 					case 'v':ch='\v';break;
-					case '\n':continue;
+					case '\n':
+						str.remove_prefix(1);
+						return "";
 					case 'x':
 					{
-						auto[jt,ec]=std::from_chars(it+1,str.end(),ch,16);
+						str.remove_prefix(1);
+						auto[jt,ec]=std::from_chars(str.begin(),str.end(),ch,16);
 						if(ec!=std::errc{})
 							ch='x';
-						it=jt-1;
+						str={jt-1,str.end()};
 					}
 					break;
 					default:
-					if('0'<=*it&&*it<'8')
-						it=std::from_chars(it,std::min(it+3,str.end()),ch,8).ptr-1;
-					else ch=*it;
+					if('0'<=str.front()&&str.front()<'8')
+						str={std::from_chars
+						(
+							str.begin(),
+							std::min(str.begin()+3,str.end()),
+							ch,
+							8
+						).ptr-1,str.end()};
+					else ch=str.front();
 				}
-				res+=ch;
+				str.remove_prefix(1);
 			}
-			else break;
-		}
-		return res;
+			return {1,ch};
+		} 
 	}
+	
 }
