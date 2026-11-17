@@ -1,8 +1,6 @@
 #include "visitor.h"
 #include "Python3Parser.h"
-#include "Python3ParserVisitor.h"
 #include "parse_number.h"
-#include "tree/ParseTreeType.h"
 #include "tree/TerminalNode.h"
 #include "utility.h"
 #include "value.h"
@@ -102,20 +100,55 @@ namespace reverSilly::PythonInterpreter
 	}
 	std::any Visitor::visitOr_test(Python3Parser::Or_testContext *ctx)
 	{
-		for(auto i:ctx->and_test())
+		if(auto sub=ctx->and_test();sub.size()==1)
+			return visit(sub.front());
+		else for(auto i:sub)
 			if(evaluate(i).to<Boolean>())
 				return Value{true};
 		return Value{false};
 	}
 	std::any Visitor::visitAnd_test(Python3Parser::And_testContext *ctx)
 	{
-		for(auto i:ctx->not_test())
+		if(auto sub=ctx->not_test();sub.size()==1)
+			return visit(sub.front());
+		else for(auto i:sub)
 			if(!evaluate(i).to<Boolean>())
 				return Value{false};
 		return Value{true};
 	}
 	std::any Visitor::visitNot_test(Python3Parser::Not_testContext *ctx)
 	{
-		return Value{!evaluate(ctx->not_test()).to<Boolean>()};
+		if(!ctx->not_test())
+			return visit(ctx->comparison());
+		return Value{!evaluate(ctx->comparison()).to<Boolean>()};
 	}
+	std::any Visitor::visitComparison(Python3Parser::ComparisonContext *ctx)
+	{
+		auto expr=ctx->arith_expr();
+		auto ops=ctx->comp_op();
+		if(ops.empty())
+			return visit(expr.front());
+		auto it=expr.begin();
+		auto jt=ops.begin();
+		Value last{evaluate(*(it++))};
+		for(;it!=expr.end()&&jt!=ops.end();++it,++jt)
+		{
+			Value cur=evaluate(*it);
+			auto op=*jt;
+			if(op->LESS_THAN()&&!(last<cur))
+				return Value{false};
+			if(op->GREATER_THAN()&&!(last>cur))
+				return Value{false};
+			if(op->EQUALS()&&last!=cur)
+				return Value{false};
+			if(op->GT_EQ()&&!(last>=cur))
+				return Value{false};
+			if(op->LT_EQ()&&!(last<=cur))
+				return Value{false};
+			if(op->NOT_EQ_2()&&last==cur)
+				return Value{false};
+		}
+		return Value{true};
+	}
+
 }
