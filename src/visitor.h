@@ -26,6 +26,10 @@ namespace reverSilly::PythonInterpreter
 		std::any visitChildren(ParseTree *t)override;
 		std::any visitAtom(Python3Parser::AtomContext*)override;
 		std::any visitTestlist(Python3Parser::TestlistContext*)override;
+		std::any visitTest(Python3Parser::TestContext*)override;
+		std::any visitOr_test(Python3Parser::Or_testContext*)override;
+		std::any visitAnd_test(Python3Parser::And_testContext*)override;
+		std::any visitNot_test(Python3Parser::Not_testContext*)override;
 
 		Value format(Python3Parser::Format_stringContext*);
 	};

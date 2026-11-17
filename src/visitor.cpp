@@ -96,4 +96,26 @@ namespace reverSilly::PythonInterpreter
 		}
 		return Value{std::move(res)};
 	}
+	std::any Visitor::visitTest(Python3Parser::TestContext *ctx)
+	{
+		return visit(ctx->or_test());
+	}
+	std::any Visitor::visitOr_test(Python3Parser::Or_testContext *ctx)
+	{
+		for(auto i:ctx->and_test())
+			if(evaluate(i).to<Boolean>())
+				return Value{true};
+		return Value{false};
+	}
+	std::any Visitor::visitAnd_test(Python3Parser::And_testContext *ctx)
+	{
+		for(auto i:ctx->not_test())
+			if(!evaluate(i).to<Boolean>())
+				return Value{false};
+		return Value{true};
+	}
+	std::any Visitor::visitNot_test(Python3Parser::Not_testContext *ctx)
+	{
+		return Value{!evaluate(ctx->not_test()).to<Boolean>()};
+	}
 }
