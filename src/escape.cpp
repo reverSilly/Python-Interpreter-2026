@@ -7,10 +7,10 @@ namespace reverSilly::PythonInterpreter
 {
 	std::string default_escape(std::string_view& str)
 	{
-		if(char ch=str.front();ch!='\\')
+		if(unsigned ch=str.front();ch!='\\')
 		{
 			str.remove_prefix(1);
-			return {1,str.front()};
+			return {1,static_cast<char>(ch)};
 		}
 		else
 		{
@@ -34,12 +34,13 @@ namespace reverSilly::PythonInterpreter
 						str.remove_prefix(1);
 						auto[jt,ec]=std::from_chars(str.begin(),str.end(),ch,16);
 						if(ec!=std::errc{})
-							ch='x';
+							return {1,'x'};
 						str={jt-1,str.end()};
 					}
 					break;
 					default:
 					if('0'<=str.front()&&str.front()<'8')
+					{
 						str={std::from_chars
 						(
 							str.begin(),
@@ -47,11 +48,12 @@ namespace reverSilly::PythonInterpreter
 							ch,
 							8
 						).ptr-1,str.end()};
+					}
 					else ch=str.front();
 				}
 				str.remove_prefix(1);
 			}
-			return {1,ch};
+			return {1,static_cast<char>(ch)};
 		} 
 	}
 	
