@@ -25,6 +25,7 @@ namespace reverSilly::PythonInterpreter
 		ControlFlow execute(ParseTree*);
 		std::any visitChildren(ParseTree *t)override;
 		std::any visitAtom(Python3Parser::AtomContext*)override;
+		std::any visitTestlist(Python3Parser::TestlistContext*)override;
 
 		Value format(Python3Parser::Format_stringContext*);
 	};

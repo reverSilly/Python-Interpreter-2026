@@ -1,5 +1,6 @@
 #include "visitor.h"
 #include "Python3Parser.h"
+#include "Python3ParserVisitor.h"
 #include "parse_number.h"
 #include "tree/ParseTreeType.h"
 #include "tree/TerminalNode.h"
@@ -80,5 +81,14 @@ namespace reverSilly::PythonInterpreter
 			}
 		}
 		return {res};
+	}
+	std::any Visitor::visitTestlist(Python3Parser::TestlistContext *ctx)
+	{
+		Tuple res;
+		for(auto i:ctx->test())
+			res.emplace_back(evaluate(i));
+		if(res.size()==1)
+			return res.front();
+		return Value{res};
 	}
 }
