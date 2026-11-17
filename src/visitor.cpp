@@ -32,7 +32,12 @@ namespace reverSilly::PythonInterpreter
 		if(ctx->NUMBER())
 			return parse_number(ctx->NUMBER()->getText());
 		if(ctx->NAME())
-			return stk.find(ctx->NAME()->getText());
+		{
+			return rethrow([&]
+			{
+				return stk.find(ctx->NAME()->getText());
+			});
+		}
 		if(!ctx->STRING().empty())
 		{
 			String res;
