@@ -82,6 +82,7 @@ namespace reverSilly::PythonInterpreter
 		}
 		return {std::move(res)};
 	}
+
 	std::any Visitor::visitTestlist(Python3Parser::TestlistContext *ctx)
 	{
 		Tuple res;
@@ -99,6 +100,7 @@ namespace reverSilly::PythonInterpreter
 	{
 		return visit(ctx->or_test());
 	}
+
 	std::any Visitor::visitOr_test(Python3Parser::Or_testContext *ctx)
 	{
 		if(auto sub=ctx->and_test();sub.size()==1)
@@ -123,6 +125,7 @@ namespace reverSilly::PythonInterpreter
 			return visit(ctx->comparison());
 		return Value{!evaluate(ctx->not_test()).to<Boolean>()};
 	}
+
 	std::any Visitor::visitComparison(Python3Parser::ComparisonContext *ctx)
 	{
 		auto expr=ctx->arith_expr();
@@ -148,6 +151,7 @@ namespace reverSilly::PythonInterpreter
 				return Value{false};
 			if(op->NOT_EQ_2()&&last==cur)
 				return Value{false};
+			last=std::move(cur);
 		}
 		return Value{true};
 	}
@@ -169,4 +173,29 @@ namespace reverSilly::PythonInterpreter
 		}
 		return acc;
 	}
+
+	std::any Visitor::visitTerm(Python3Parser::TermContext *ctx)
+	{
+		auto factors=ctx->factor();
+		auto ops=ctx->muldivmod_op();
+		auto it=factors.begin();
+		auto jt=ops.begin();
+		Value product{evaluate(*(it++))};
+		for(;it!=factors.end()&&jt!=ops.end();++it,++jt)
+		{
+			auto op=*jt;
+			Value cur{evaluate(*it)};
+			if(op->STAR())
+				product=product*cur;
+			if(op->DIV())
+				product=product/cur;
+			if(op->IDIV())
+				product=floor_division(product,cur);
+			if(op->MOD())
+				product=product%cur;
+		}
+		return product;
+	}
+
+	
 }

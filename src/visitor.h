@@ -1,11 +1,10 @@
 #pragma once
-#include "Python3Parser.h"
-#include "Python3ParserVisitor.h"
-#include "ScopeStack.h"
-#include "function.h"
 #ifndef PYTHON_INTERPRETER_EVALVISITOR_H
 #define PYTHON_INTERPRETER_EVALVISITOR_H
 
+#include "Python3Parser.h"
+#include "ScopeStack.h"
+#include "function.h"
 #include "value.h"
 #include "ControlFlow.h"
 #include "Python3ParserBaseVisitor.h"
@@ -31,6 +30,7 @@ namespace reverSilly::PythonInterpreter
 		std::any visitNot_test(Python3Parser::Not_testContext*)override;
 		std::any visitComparison(Python3Parser::ComparisonContext*)override;
 		std::any visitArith_expr(Python3Parser::Arith_exprContext*)override;
+		std::any visitTerm(Python3Parser::TermContext*)override;
 
 		Value format(Python3Parser::Format_stringContext*);
 	};
