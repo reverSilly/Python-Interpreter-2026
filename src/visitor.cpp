@@ -2,6 +2,7 @@
 #include "ControlFlow.h"
 #include "Python3Parser.h"
 #include "Python3ParserBaseVisitor.h"
+#include "ScopeStack.h"
 #include "builtins.h"
 #include "function.h"
 #include "parse_number.h"
@@ -396,9 +397,43 @@ namespace reverSilly::PythonInterpreter
 		return ControlFlow{ControlFlow::Normal{}};
 	}
 
-	// std::any Visitor::visitFuncdef(Python3Parser::FuncdefContext *ctx)
-	// {
-	// 	std::string name=ctx->NAME()->getText();
-
-	// }
+	std::any Visitor::visitFuncdef(Python3Parser::FuncdefContext *ctx)
+	{
+		std::string name=ctx->NAME()->getText();
+		FunctionDefinition def{.body=ctx->suite()};
+		parse_parameter(def,ctx->parameters());
+		auto func=[def,this](Arguments arg)->Value
+		{
+			ScopeGuard guard(stk,def.accept(std::move(arg)));
+			auto res=execute(def.body);
+			if(auto i=std::get_if<ControlFlow::Return>(&res.data))
+				return std::move(i->value);
+			else if(auto i=std::get_if<ControlFlow::Normal>(&res.data))
+				return {};
+			else throw_program_error("error break/continue at function level");
+		};
+		return ControlFlow{ControlFlow::Normal{}};
+	}
+	void Visitor::parse_parameter
+		(FunctionDefinition &def,Python3Parser::ParametersContext *ctx)
+	{
+		if(auto params=ctx->typedargslist())
+		{
+			std::string lastparam;
+			for(auto i:params->children)
+			{
+				if(auto name=dynamic_cast<Python3Parser::TfpdefContext*>(i))
+				{
+					lastparam=name->NAME()->getText();
+					def.params.push_back(lastparam);
+				}
+				if(auto test=dynamic_cast<Python3Parser::TestContext*>(i))
+				{
+					auto[_,b]=def.defaults.insert({lastparam,evaluate(test)});
+					if(!b)
+						throw_program_error(std::format("multiple defaults for parameter {}",lastparam));
+				}
+			}
+		}
+	}
 }
