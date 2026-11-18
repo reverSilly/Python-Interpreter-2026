@@ -290,8 +290,8 @@ namespace reverSilly::PythonInterpreter
 					{
 						auto it=tup.begin();
 						auto jt=test.begin();
-						for(;it!=tup.begin()&&jt!=test.begin();++it,++jt)
-							stk.assign((*jt)->getText(),std::move(*it));
+						for(;it!=tup.end()&&jt!=test.end();++it,++jt)
+							stk.assign((*jt)->getText(),*it);
 					}
 				}
 				else throw_program_error(std::format("unpack rhs not tuple: {}",rhs.to<String>()));
