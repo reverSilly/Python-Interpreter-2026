@@ -1,4 +1,5 @@
 #include "visitor.h"
+#include "ControlFlow.h"
 #include "Python3Parser.h"
 #include "Python3ParserBaseVisitor.h"
 #include "builtins.h"
@@ -245,4 +246,39 @@ namespace reverSilly::PythonInterpreter
 		}
 		return args;
 	}
+
+	std::any Visitor::visitExpr_stmt(Python3Parser::Expr_stmtContext *ctx)
+	{
+		if(auto assign=ctx->augassign();assign)
+		{
+			Value &lhs=rethrow([this,ctx]()->Value&
+			{
+				return stk.find(ctx->testlist(0)->getText());
+			});
+			Value rhs=evaluate(ctx->testlist(1));
+			if(assign->ADD_ASSIGN())
+				lhs=lhs+rhs;
+			if(assign->DIV_ASSIGN())
+				lhs=lhs/rhs;
+			if(assign->IDIV_ASSIGN())
+				lhs=floor_division(lhs,rhs);
+			if(assign->MOD_ASSIGN())
+				lhs=lhs%rhs;
+			if(assign->MULT_ASSIGN())
+				lhs=lhs*rhs;
+			if(assign->SUB_ASSIGN())
+				lhs=lhs-rhs;
+		}
+		else if(!ctx->ASSIGN().empty())
+		{
+			auto test=ctx->testlist();
+			auto it=test.rbegin();
+			Value rhs{evaluate(*(it++))};
+			for(;it!=test.rend();++it)
+				stk.assign((*it)->getText(),rhs);
+		}
+		else evaluate(ctx->testlist(0));
+		return ControlFlow{};
+	}
+
 }

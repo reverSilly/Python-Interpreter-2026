@@ -12,7 +12,7 @@ namespace reverSilly::PythonInterpreter
 	[[noreturn]]void throw_not_implemented(std::string msg);
 	[[noreturn]]void throw_program_error(std::string msg);
 
-	auto rethrow(auto F)
+	decltype(auto) rethrow(auto&& F)
 	{
 		try{ return F(); }
 		catch(std::exception &e)
