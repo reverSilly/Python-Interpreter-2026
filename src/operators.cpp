@@ -14,13 +14,13 @@ namespace reverSilly::PythonInterpreter
 			return {a.as<Tuple>()+b.as<Tuple>()};
 		if(a.is<String>()&&b.is<String>())
 			return {a.as<String>()+b.as<String>()};
-		return do_promoted<Value>(a,b,[](auto &a,auto &b){return a+b;},"+");
+		return do_promoted<Value>(a,b,[](auto &&a,auto &&b){return a+b;},"+");
 	}
 	Value operator-(Value const &a,Value const &b)
 	{
 		if(a.is<Tuple>()&&b.is<Tuple>())
 			return {a.as<Tuple>()-b.as<Tuple>()};
-		return do_promoted<Value>(a,b,[](auto &a,auto &b){return a-b;},"-");
+		return do_promoted<Value>(a,b,[](auto &&a,auto &&b){return a-b;},"-");
 	}
 	std::string repeat(std::string s,int2048::Integer const &n)
 	{
@@ -49,7 +49,7 @@ namespace reverSilly::PythonInterpreter
 			return str(a,b);
 		if(bool_or_int(a.type())&&b.type()==Type::String)
 			return str(b,a);
-		return do_promoted<Value>(a,b,[](auto const &a,auto const &b){return a*b;},"*");
+		return do_promoted<Value>(a,b,[](auto &&a,auto &&b){return a*b;},"*");
 	}
 	Float check_fzero(Float f)
 	{
