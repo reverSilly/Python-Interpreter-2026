@@ -412,9 +412,7 @@ namespace reverSilly::PythonInterpreter
 				return {};
 			else throw_program_error("error break/continue at function level");
 		};
-		auto[_,b]=table.insert({name,std::move(func)});
-		if(!b)
-			throw_program_error(std::format("multiple function definition for {}",name));
+		table.insert_or_assign(name,std::move(func));
 		return ControlFlow{ControlFlow::Normal{}};
 	}
 	void Visitor::parse_parameter
