@@ -366,6 +366,22 @@ namespace reverSilly::PythonInterpreter
 		return ControlFlow{ControlFlow::Normal{}};
 	}
 
+	std::any Visitor::visitIf_stmt(Python3Parser::If_stmtContext *ctx)
+	{
+		auto test=ctx->test();
+		auto suite=ctx->suite();
+		auto it=test.begin();
+		auto jt=suite.begin();
+		for(;it!=test.end()&&jt!=suite.end();++it,++jt)
+		{
+			if(evaluate(*it).to<Boolean>())
+				return execute(*jt);
+		}
+		if(jt!=suite.end())
+			return execute(*jt);
+		return ControlFlow{ControlFlow::Normal{}};
+	}
+
 	// std::any Visitor::visitFuncdef(Python3Parser::FuncdefContext *ctx)
 	// {
 	// 	std::string name=ctx->NAME()->getText();
