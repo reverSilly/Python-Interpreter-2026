@@ -224,7 +224,7 @@ namespace reverSilly::PythonInterpreter
 		if(!ctx->trailer())
 			return visit(ctx->atom());
 		if(!ctx->atom()->NAME())
-			throw ProgramError{std::format("function call not by name: {}",ctx->atom()->getText())};
+			throw_program_error(std::format("function call not by name: {}",ctx->atom()->getText()));
 		auto const&fun=rethrow([this,ctx]()->auto&
 		{
 			return table.at(ctx->atom()->NAME()->getText());
@@ -240,7 +240,7 @@ namespace reverSilly::PythonInterpreter
 			{
 				std::string name=i->test(0)->getText();
 				if(auto[_,b]=args.named.insert({name,evaluate(i->test(1))});!b)
-					throw ProgramError{std::format("duplicated named arguments: {}",name)};
+					throw_program_error(std::format("duplicated named arguments: {}",name));
 			}
 			else
 				args.positional.push_back(evaluate(i->test().front()));
@@ -252,11 +252,11 @@ namespace reverSilly::PythonInterpreter
 	{
 		if(auto assign=ctx->augassign();assign)
 		{
+			Value rhs=evaluate(ctx->testlist(1));
 			Value &lhs=rethrow([this,ctx]()->Value&
 			{
 				return stk.find(ctx->testlist(0)->getText());
 			});
-			Value rhs=evaluate(ctx->testlist(1));
 			if(assign->ADD_ASSIGN())
 				lhs=lhs+rhs;
 			if(assign->DIV_ASSIGN())
@@ -276,7 +276,26 @@ namespace reverSilly::PythonInterpreter
 			auto it=test.rbegin();
 			Value rhs{evaluate(*(it++))};
 			for(;it!=test.rend();++it)
-				stk.assign((*it)->getText(),rhs);
+			{
+				auto testlist=(*it);
+				if(testlist->COMMA().empty())
+					stk.assign((*it)->test(0)->getText(),rhs);
+				else if(rhs.is<Tuple>())
+				{
+					auto test=testlist->test();
+					Tuple &tup=rhs.as<Tuple>();
+					if(tup.size()!=test.size())
+						throw_program_error(std::format("unpack size not match: expected {}, got {}",tup.size(),test.size()));
+					else
+					{
+						auto it=tup.begin();
+						auto jt=test.begin();
+						for(;it!=tup.begin()&&jt!=test.begin();++it,++jt)
+							stk.assign((*jt)->getText(),std::move(*it));
+					}
+				}
+				else throw_program_error(std::format("unpack rhs not tuple: {}",rhs.to<String>()));
+			}
 		}
 		else evaluate(ctx->testlist(0));
 		return ControlFlow{};

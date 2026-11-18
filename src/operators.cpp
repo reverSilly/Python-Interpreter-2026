@@ -48,7 +48,7 @@ namespace reverSilly::PythonInterpreter
 	Float check_fzero(Float f)
 	{
 		if(f==0)
-			throw ProgramError{"divided by zero"};
+			throw_program_error("divided by zero");
 		return f;
 	}
 	Value operator/(Value const &a,Value const &b)
@@ -109,11 +109,11 @@ namespace reverSilly::PythonInterpreter
 			[](Float a)->Value{return {-a};},
 			[](auto &&v)->Value
 			{
-				throw ProgramError{std::format
+				throw_program_error(std::format
 				(
 					"unary operator- not defined for type: {}",
 					type_name<std::remove_cvref_t<decltype(v)>>()
-				)};
+				));
 			}
 		);
 	}

@@ -112,12 +112,12 @@ namespace reverSilly
 			{
 				return [](auto &&v)->R
 				{
-					throw ProgramError{std::format
+					throw_program_error(std::format
 					(
 						"cannot convert types: {}->{}",
 						PythonInterpreter::type_name<std::remove_cvref_t<decltype(v)>>(),
 						PythonInterpreter::type_name<std::remove_cvref_t<R>>()
-					)};
+					));
 				};
 			}
 		};

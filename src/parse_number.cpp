@@ -25,7 +25,7 @@ namespace reverSilly::PythonInterpreter
 		Float val;
 		auto[p,ec]=std::from_chars(s.begin(),s.end(),val);
 		if(p!=s.end()||ec!=std::errc{})
-			throw ProgramError{"number literal not recognized:"+str{s}};
+			throw_program_error("number literal not recognized:"+str{s});
 		return {val};
 	}
 }
