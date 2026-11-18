@@ -2,6 +2,7 @@
 #include "value.h"
 #include "utility.h"
 #include <format>
+#include <stdexcept>
 
 namespace reverSilly::PythonInterpreter
 {
@@ -9,7 +10,9 @@ namespace reverSilly::PythonInterpreter
 	R do_promoted(Value const &a,Value const &b,auto F,std::string_view op_name="arithmetic")
 	{
 		if(!a.is_numeric()||!b.is_numeric())
-			throw_program_error(std::format("arithmetic operation not defined for types: {}{}{}",a.type_name(),op_name,b.type_name()));
+			throw_program_error(std::format
+		("arithmetic operation not defined for types: {}{}{}",
+			a.type_name(),op_name,b.type_name()));
 		Type t=common_type(a.type(),b.type());
 		if(t==Type::Integer)
 			return R{F(a.to<Integer>(),b.to<Integer>())};
@@ -27,4 +30,16 @@ namespace reverSilly::PythonInterpreter
 	Value operator+(Value const&);
 	Value operator-(Value const&);
 
+	Tuple zip_transform(Tuple const &a,Tuple const &b,auto &&F)
+	{
+		if(a.size()!=b.size())
+			throw std::invalid_argument
+		{std::format("tuple operation length not match: {} vs {}",a.size(),b.size())};
+		auto it=a.begin(),jt=b.begin();
+		Tuple res;
+		res.reserve(a.size());
+		for(;it!=a.end()&&jt!=b.end();++it,++jt)
+			res.push_back(F(*it,*jt));
+		return res;
+	}
 }
