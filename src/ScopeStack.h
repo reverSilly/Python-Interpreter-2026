@@ -2,6 +2,7 @@
 #include "value.h"
 #include <string>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 namespace reverSilly::PythonInterpreter
@@ -28,6 +29,10 @@ namespace reverSilly::PythonInterpreter
 		ScopeGuard(ScopeStack &p):p{p}
 		{
 			p.push();
+		}
+		ScopeGuard(ScopeStack &p,ScopeStack::Scope s):p{p}
+		{
+			p.push(std::move(s));
 		}
 		~ScopeGuard()
 		{
