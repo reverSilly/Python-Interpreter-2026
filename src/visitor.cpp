@@ -290,4 +290,9 @@ namespace reverSilly::PythonInterpreter
 			return visit(compound);
 		throw_not_implemented("not implemented statement");
 	}
+
+	std::any Visitor::visitSimple_stmt(Python3Parser::Simple_stmtContext *ctx)
+	{
+		return visit(ctx->small_stmt());
+	}
 }
