@@ -2,6 +2,7 @@
 #include "ControlFlow.h"
 #include "Python3Parser.h"
 #include "Python3ParserBaseVisitor.h"
+#include "Python3ParserVisitor.h"
 #include "ScopeStack.h"
 #include "builtins.h"
 #include "function.h"
@@ -98,16 +99,16 @@ namespace reverSilly::PythonInterpreter
 
 	std::any Visitor::visitTestlist(Python3Parser::TestlistContext *ctx)
 	{
+		if(ctx->COMMA().empty())
+			return visit(ctx->test(0));
+		return visitTuple(ctx);
+	}
+	Tuple Visitor::visitTuple(Python3Parser::TestlistContext *ctx)
+	{
 		Tuple res;
 		for(auto i:ctx->test())
 			res.emplace_back(evaluate(i));
-		if(res.size()==1)
-		{
-			if(!ctx->COMMA().empty())
-				return Value{std::move(res)};
-			return std::move(res.front());
-		}
-		return Value{std::move(res)};
+		return res;
 	}
 	std::any Visitor::visitTest(Python3Parser::TestContext *ctx)
 	{
@@ -252,55 +253,50 @@ namespace reverSilly::PythonInterpreter
 
 	std::any Visitor::visitExpr_stmt(Python3Parser::Expr_stmtContext *ctx)
 	{
-		if(auto assign=ctx->augassign();assign)
+		if(auto aug=ctx->augassign();aug)
 		{
-			Value rhs=evaluate(ctx->testlist(1));
-			Value &lhs=rethrow([this,ctx]()->Value&
-			{
-				return stk.find(ctx->testlist(0)->getText());
-			});
-			if(assign->ADD_ASSIGN())
+			Tuple lhs=visitTuple(ctx->testlist(0));
+			Tuple rhs=visitTuple(ctx->testlist(1));
+			if(aug->ADD_ASSIGN())
 				lhs=lhs+rhs;
-			if(assign->DIV_ASSIGN())
+			if(aug->DIV_ASSIGN())
 				lhs=lhs/rhs;
-			if(assign->IDIV_ASSIGN())
+			if(aug->IDIV_ASSIGN())
 				lhs=floor_division(lhs,rhs);
-			if(assign->MOD_ASSIGN())
+			if(aug->MOD_ASSIGN())
 				lhs=lhs%rhs;
-			if(assign->MULT_ASSIGN())
+			if(aug->MULT_ASSIGN())
 				lhs=lhs*rhs;
-			if(assign->SUB_ASSIGN())
+			if(aug->SUB_ASSIGN())
 				lhs=lhs-rhs;
+			assign(ctx->testlist(0),std::move(lhs));
 		}
 		else if(!ctx->ASSIGN().empty())
 		{
 			auto test=ctx->testlist();
 			auto it=test.rbegin();
 			Value rhs{evaluate(*(it++))};
+			if(!rhs.is<Tuple>())
+				rhs={Tuple{rhs}};
 			for(;it!=test.rend();++it)
-			{
-				auto testlist=(*it);
-				if(testlist->COMMA().empty())
-					stk.assign((*it)->test(0)->getText(),rhs);
-				else if(rhs.is<Tuple>())
-				{
-					auto test=testlist->test();
-					Tuple &tup=rhs.as<Tuple>();
-					if(tup.size()!=test.size())
-						throw_program_error(std::format("unpack size not match: expected {}, got {}",tup.size(),test.size()));
-					else
-					{
-						auto it=tup.begin();
-						auto jt=test.begin();
-						for(;it!=tup.end()&&jt!=test.end();++it,++jt)
-							stk.assign((*jt)->getText(),*it);
-					}
-				}
-				else throw_program_error(std::format("unpack rhs not tuple: {}",rhs.to<String>()));
-			}
+				assign(*it,rhs.as<Tuple>());
 		}
 		else evaluate(ctx->testlist(0));
+		//why function return values are considered tuple in assign, but not in 
 		return ControlFlow{};
+	}
+	void Visitor::assign(Python3Parser::TestlistContext* names,Tuple tup)
+	{
+		auto test=names->test();
+		if(tup.size()!=test.size())
+			throw_program_error(std::format("unpack size not match: expected {}, got {}",tup.size(),test.size()));
+		else
+		{
+			auto it=tup.begin();
+			auto jt=test.begin();
+			for(;it!=tup.end()&&jt!=test.end();++it,++jt)
+				stk.assign((*jt)->getText(),*it);
+		}
 	}
 
 	std::any Visitor::visitStmt(Python3Parser::StmtContext *ctx)

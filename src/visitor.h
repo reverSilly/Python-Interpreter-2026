@@ -49,8 +49,10 @@ namespace reverSilly::PythonInterpreter
 		std::any visitFuncdef(Python3Parser::FuncdefContext*)override;
 
 		Value format(Python3Parser::Format_stringContext*);
+		void assign(Python3Parser::TestlistContext*,Tuple);
 		Arguments parse_arguments(Python3Parser::ArglistContext*);
 		void parse_parameter(FunctionDefinition&,Python3Parser::ParametersContext*);
+		Tuple visitTuple(Python3Parser::TestlistContext*);
 	public:
 		Visitor();
 	};
