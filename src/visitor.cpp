@@ -402,7 +402,7 @@ namespace reverSilly::PythonInterpreter
 		std::string name=ctx->NAME()->getText();
 		FunctionDefinition def{.body=ctx->suite()};
 		parse_parameter(def,ctx->parameters());
-		auto func=[def,this](Arguments arg)->Value
+		auto func=[def=std::move(def),this](Arguments arg)->Value
 		{
 			ScopeGuard guard(stk,def.accept(std::move(arg)));
 			auto res=execute(def.body);
@@ -412,6 +412,9 @@ namespace reverSilly::PythonInterpreter
 				return {};
 			else throw_program_error("error break/continue at function level");
 		};
+		auto[_,b]=table.insert({name,std::move(func)});
+		if(!b)
+			throw_program_error(std::format("multiple function definition for {}",name));
 		return ControlFlow{ControlFlow::Normal{}};
 	}
 	void Visitor::parse_parameter
