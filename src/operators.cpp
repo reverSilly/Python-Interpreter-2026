@@ -8,24 +8,18 @@
 
 namespace reverSilly::PythonInterpreter
 {
-	std::optional<Value>try_tuple(Value const&a,Value const &b,auto &&F)
-	{
-		if(a.is<Tuple>()&&b.is<Tuple>())
-			return Value{zip_transform(a.as<Tuple>(),b.as<Tuple>(),F)};
-		return std::nullopt;
-	}
 	Value operator+(Value const &a,Value const &b)
 	{
-		if(auto res=try_tuple(a,b,[](auto &a,auto &b){return a+b;}))
-			return *res;
+		if(a.is<Tuple>()&&b.is<Tuple>())
+			return {a.as<Tuple>()+b.as<Tuple>()};
 		if(a.is<String>()&&b.is<String>())
 			return {a.as<String>()+b.as<String>()};
 		return do_promoted<Value>(a,b,[](auto &a,auto &b){return a+b;},"+");
 	}
 	Value operator-(Value const &a,Value const &b)
 	{
-		if(auto res=try_tuple(a,b,[](auto &a,auto &b){return a-b;}))
-			return *res;
+		if(a.is<Tuple>()&&b.is<Tuple>())
+			return {a.as<Tuple>()-b.as<Tuple>()};
 		return do_promoted<Value>(a,b,[](auto &a,auto &b){return a-b;},"-");
 	}
 	std::string repeat(std::string s,int2048::Integer const &n)
@@ -49,8 +43,8 @@ namespace reverSilly::PythonInterpreter
 				return {String("")};
 			return {repeat(a.as<String>(),bb.data())};
 		};
-		if(auto res=try_tuple(a,b,[](auto &a,auto &b){return a*b;}))
-			return *res;
+		if(a.is<Tuple>()&&b.is<Tuple>())
+			return {a.as<Tuple>()*b.as<Tuple>()};
 		if(a.type()==Type::String&&bool_or_int(b.type()))
 			return str(a,b);
 		if(bool_or_int(a.type())&&b.type()==Type::String)
@@ -65,16 +59,16 @@ namespace reverSilly::PythonInterpreter
 	}
 	Value operator/(Value const &a,Value const &b)
 	{
-		if(auto res=try_tuple(a,b,[](auto &a,auto &b){return a/b;}))
-			return *res;
+		if(a.is<Tuple>()&&b.is<Tuple>())
+			return {a.as<Tuple>()/b.as<Tuple>()};
 		if(!a.is_numeric()||!b.is_numeric())
 			throw_program_error(std::format("not defined: {}/{}",a.type_name(),b.type_name()));
 		return rethrow([&]{return Value{a.to<Float>()/check_fzero(b.to<Float>())};});
 	}
 	Value floor_division(const Value &a,const Value &b)
 	{
-		if(auto res=try_tuple(a,b,[](auto &a,auto &b){return floor_division(a,b);}))
-			return *res;
+		if(a.is<Tuple>()&&b.is<Tuple>())
+			return {floor_division(a.as<Tuple>(),b.as<Tuple>())};
 		return do_promoted<Value>(a,b,overloaded{[](Integer const &a,Integer const &b)
 		{
 			return rethrow([&]
@@ -88,8 +82,8 @@ namespace reverSilly::PythonInterpreter
 	}
 	Value operator%(const Value &a,const Value &b)
 	{
-		if(auto res=try_tuple(a,b,[](auto &a,auto &b){return a%b;}))
-			return *res;
+		if(a.is<Tuple>()&&b.is<Tuple>())
+			return {a.as<Tuple>()%b.as<Tuple>()};
 		auto fmod=[](Float a,Float b)
 		{
 			check_fzero(b);
@@ -111,8 +105,8 @@ namespace reverSilly::PythonInterpreter
 	}
 	Value operator+(const Value &a)
 	{
-		if(auto res=try_tuple(a,a,[](auto &a,auto &b){return +a;}))
-			return *res;
+		if(a.is<Tuple>())
+			return {+a.as<Tuple>()};
 		if(a.type()==Type::Boolean)
 			return {a.to<Integer>()};
 		if(a.is_numeric())
@@ -121,8 +115,8 @@ namespace reverSilly::PythonInterpreter
 	}
 	Value operator-(const Value &a)
 	{
-		if(auto res=try_tuple(a,a,[](auto &a,auto &b){return -a;}))
-			return *res;
+		if(a.is<Tuple>())
+			return {-a.as<Tuple>()};
 		if(a.type()==Type::Boolean)
 			return {-a.to<Integer>()};
 		return a.visit<Value>
@@ -138,5 +132,38 @@ namespace reverSilly::PythonInterpreter
 				));
 			}
 		);
+	}
+
+	Tuple operator+(Tuple const &a,Tuple const &b)
+	{
+		return zip_transform(a,b,[](auto &a,auto &b){return a+b;});
+	}
+	Tuple operator-(Tuple const &a,Tuple const &b)
+	{
+		return zip_transform(a,b,[](auto &a,auto &b){return a-b;});
+	}
+	Tuple operator*(Tuple const &a,Tuple const &b)
+	{
+		return zip_transform(a,b,[](auto &a,auto &b){return a*b;});
+	}
+	Tuple operator/(Tuple const &a,Tuple const &b)
+	{
+		return zip_transform(a,b,[](auto &a,auto &b){return a/b;});
+	}
+	Tuple floor_division(Tuple const &a,Tuple const &b)
+	{
+		return zip_transform(a,b,[](auto &a,auto &b){return floor_division(a,b);});
+	}
+	Tuple operator%(Tuple const &a,Tuple const &b)
+	{
+		return zip_transform(a,b,[](auto &a,auto &b){return a%b;});
+	}
+	Tuple operator+(Tuple const &a)
+	{
+		return zip_transform(a,a,[](auto &a,auto &b){return +a;});
+	}
+	Tuple operator-(Tuple const &a)
+	{
+		return zip_transform(a,a,[](auto &a,auto &b){return -a;});
 	}
 }

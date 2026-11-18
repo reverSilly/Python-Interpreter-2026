@@ -30,6 +30,15 @@ namespace reverSilly::PythonInterpreter
 	Value operator+(Value const&);
 	Value operator-(Value const&);
 
+	Tuple operator+(Tuple const&,Tuple const&);
+	Tuple operator-(Tuple const&,Tuple const&);
+	Tuple operator*(Tuple const&,Tuple const&);
+	Tuple operator/(Tuple const&,Tuple const&);
+	Tuple floor_division(Tuple const&,Tuple const&);
+	Tuple operator%(Tuple const&,Tuple const&);
+	Tuple operator+(Tuple const&);
+	Tuple operator-(Tuple const&);
+
 	Tuple zip_transform(Tuple const &a,Tuple const &b,auto &&F)
 	{
 		if(a.size()!=b.size())
