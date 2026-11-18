@@ -1,5 +1,4 @@
 #pragma once
-#include "Python3ParserVisitor.h"
 #ifndef PYTHON_INTERPRETER_EVALVISITOR_H
 #define PYTHON_INTERPRETER_EVALVISITOR_H
 
@@ -42,6 +41,8 @@ namespace reverSilly::PythonInterpreter
 		std::any visitBreak_stmt(Python3Parser::Break_stmtContext*)override;
 		std::any visitContinue_stmt(Python3Parser::Continue_stmtContext*)override;
 		std::any visitReturn_stmt(Python3Parser::Return_stmtContext*)override;
+		std::any visitFlow_stmt(Python3Parser::Flow_stmtContext*)override;
+		std::any visitCompound_stmt(Python3Parser::Compound_stmtContext*)override;
 		// std::any visitFuncdef(Python3Parser::FuncdefContext*)override;
 
 		Value format(Python3Parser::Format_stringContext*);

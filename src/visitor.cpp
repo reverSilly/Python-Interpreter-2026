@@ -345,6 +345,15 @@ namespace reverSilly::PythonInterpreter
 			return ControlFlow{ControlFlow::Return{}};
 	}
 
+	std::any Visitor::visitFlow_stmt(Python3Parser::Flow_stmtContext *ctx)
+	{
+		return visit(ctx->children.front());
+	}
+	std::any Visitor::visitCompound_stmt(Python3Parser::Compound_stmtContext *ctx)
+	{
+		return visit(ctx->children.front());
+	}
+
 	// std::any Visitor::visitFuncdef(Python3Parser::FuncdefContext *ctx)
 	// {
 	// 	std::string name=ctx->NAME()->getText();
