@@ -101,7 +101,7 @@ namespace reverSilly::PythonInterpreter
 	{
 		if(ctx->COMMA().empty())
 			return visit(ctx->test(0));
-		return visitTuple(ctx);
+		return Value{visitTuple(ctx)};
 	}
 	Tuple Visitor::visitTuple(Python3Parser::TestlistContext *ctx)
 	{

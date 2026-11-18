@@ -25,7 +25,7 @@ namespace reverSilly::PythonInterpreter
 	std::string repeat(std::string s,int2048::Integer const &n)
 	{
 		std::string res;
-		for(u32 i=0,len=n.len();i<len;(++i)<len?s+=s:0)
+		for(u32 i=0,len=n.len();i<len;(++i)<len?(s+=s,0):0)
 			if(n.get_bit(i))
 				res+=s;
 		return res;
