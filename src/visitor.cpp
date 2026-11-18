@@ -257,6 +257,8 @@ namespace reverSilly::PythonInterpreter
 		{
 			Tuple lhs=visitTuple(ctx->testlist(0));
 			Tuple rhs=visitTuple(ctx->testlist(1));
+			if(lhs.size()!=rhs.size())
+				throw_program_error("augassign");
 			if(aug->ADD_ASSIGN())
 				lhs=lhs+rhs;
 			if(aug->DIV_ASSIGN())
