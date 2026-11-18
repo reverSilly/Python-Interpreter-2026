@@ -12,6 +12,7 @@
 #include "operators.h"
 #include <any>
 #include <format>
+#include <ranges>
 #include <utility>
 
 namespace reverSilly::PythonInterpreter
@@ -281,4 +282,12 @@ namespace reverSilly::PythonInterpreter
 		return ControlFlow{};
 	}
 
+	std::any Visitor::visitStmt(Python3Parser::StmtContext *ctx)
+	{
+		if(auto simple=ctx->simple_stmt())
+			return visit(simple);
+		if(auto compound=ctx->compound_stmt())
+			return visit(compound);
+		throw_not_implemented("not implemented statement");
+	}
 }
