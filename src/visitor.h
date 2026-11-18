@@ -45,6 +45,7 @@ namespace reverSilly::PythonInterpreter
 		std::any visitCompound_stmt(Python3Parser::Compound_stmtContext*)override;
 		std::any visitSuite(Python3Parser::SuiteContext*)override;
 		std::any visitIf_stmt(Python3Parser::If_stmtContext*)override;
+		std::any visitWhile_stmt(Python3Parser::While_stmtContext*)override;
 		// std::any visitFuncdef(Python3Parser::FuncdefContext*)override;
 
 		Value format(Python3Parser::Format_stringContext*);

@@ -14,6 +14,7 @@
 #include <format>
 #include <ranges>
 #include <utility>
+#include <variant>
 
 namespace reverSilly::PythonInterpreter
 {
@@ -379,6 +380,19 @@ namespace reverSilly::PythonInterpreter
 		}
 		if(jt!=suite.end())
 			return execute(*jt);
+		return ControlFlow{ControlFlow::Normal{}};
+	}
+	std::any Visitor::visitWhile_stmt(Python3Parser::While_stmtContext *ctx)
+	{
+		auto test=ctx->test();
+		auto suite=ctx->suite();
+		while(evaluate(test).to<Boolean>())
+		{
+			if(auto res=execute(suite);std::get_if<ControlFlow::Break>(&res.data))
+				return ControlFlow{ControlFlow::Normal{}};
+			else if(std::get_if<ControlFlow::Return>(&res.data))
+				return res;
+		}
 		return ControlFlow{ControlFlow::Normal{}};
 	}
 
