@@ -328,4 +328,26 @@ namespace reverSilly::PythonInterpreter
 			visit(i);
 		return ControlFlow{};
 	}
+
+	std::any Visitor::visitBreak_stmt(Python3Parser::Break_stmtContext *ctx)
+	{
+		return ControlFlow{ControlFlow::Break{}};
+	}
+	std::any Visitor::visitContinue_stmt(Python3Parser::Continue_stmtContext *ctx)
+	{
+		return ControlFlow{ControlFlow::Continue{}};
+	}
+	std::any Visitor::visitReturn_stmt(Python3Parser::Return_stmtContext *ctx)
+	{
+		if(auto tl=ctx->testlist())
+			return ControlFlow{ControlFlow::Return{evaluate(tl)}};
+		else
+			return ControlFlow{ControlFlow::Return{}};
+	}
+
+	// std::any Visitor::visitFuncdef(Python3Parser::FuncdefContext *ctx)
+	// {
+	// 	std::string name=ctx->NAME()->getText();
+
+	// }
 }
