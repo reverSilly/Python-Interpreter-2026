@@ -302,4 +302,11 @@ namespace reverSilly::PythonInterpreter
 			return visit(flow);
 		throw_not_implemented("not implemented Small_stmt");
 	}
+
+	std::any Visitor::visitFile_input(Python3Parser::File_inputContext *ctx)
+	{
+		for(auto i:ctx->stmt())
+			visit(i);
+		return ControlFlow{};
+	}
 }

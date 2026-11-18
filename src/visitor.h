@@ -37,6 +37,7 @@ namespace reverSilly::PythonInterpreter
 		std::any visitStmt(Python3Parser::StmtContext*)override;
 		std::any visitSimple_stmt(Python3Parser::Simple_stmtContext*)override;
 		std::any visitSmall_stmt(Python3Parser::Small_stmtContext*)override;
+		std::any visitFile_input(Python3Parser::File_inputContext*)override;
 
 		Value format(Python3Parser::Format_stringContext*);
 		Arguments parse_arguments(Python3Parser::ArglistContext*);
